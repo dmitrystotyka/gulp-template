@@ -9,6 +9,8 @@ export const server = () => {
     {
       server: {
         baseDir: paths.build,
+        // Clean URLs like the Vercel deploy (`cleanUrls: true`): /about → about.html
+        serveStaticOptions: { extensions: ['html'] },
       },
       port: config.server.port,
       notify: false,
@@ -16,7 +18,7 @@ export const server = () => {
       cors: true,
       logLevel: 'silent',
       middleware: [
-        // Serve 404.html for unmatched routes (dev only)
+        // Serve 404.html for unmatched pages (dev only)
         (req, res, next) => {
           let url;
           try {
@@ -25,8 +27,9 @@ export const server = () => {
             return next();
           }
 
-          // Let BrowserSync handle static assets and existing files
-          if (path.extname(url)) return next();
+          // Only page requests: extensionless or explicit .html
+          const ext = path.extname(url);
+          if (ext && ext !== '.html') return next();
 
           // Reject path traversal — only look up files inside the build dir
           const buildRoot = path.resolve(paths.build);

@@ -10,16 +10,20 @@ import { logWarning } from '../utils/logger.js';
  * Note: only shallow copies — the config may hold functions (e.g. postcss plugins).
  */
 const validateConfig = (cfg) => {
-  const validated = { ...cfg, server: { ...cfg.server } };
+  const validated = { ...cfg, server: { ...cfg.server }, site: { ...cfg.site } };
 
   if (!validated.server.port) {
     logWarning(`Missing config: server.port — defaulting to ${env.port}`);
     validated.server.port = env.port;
   }
 
-  if (!validated.server.hostname) {
-    logWarning(`Missing config: server.hostname — defaulting to ${env.siteUrl}`);
-    validated.server.hostname = env.siteUrl;
+  if (!validated.site.url) {
+    logWarning(`Missing config: site.url — defaulting to ${env.siteUrl}`);
+    validated.site.url = env.siteUrl;
+  }
+
+  if (!validated.site.lang) {
+    validated.site.lang = 'en';
   }
 
   // tailwind.enabled: 'auto' → active when the entry file exists (created by `pnpm tailwind:setup`)

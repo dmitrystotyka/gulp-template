@@ -1,4 +1,5 @@
 import pkg from '../../package.json' with { type: 'json' };
+import { env } from '../configs/env.js';
 
 const colors = {
   reset: '\x1b[0m',
@@ -18,23 +19,18 @@ const divider = (char = '─', length = 50) => `${c.dim}${char.repeat(length)}${
 
 let buildStartTime = 0;
 
-const getEnvInfo = () => {
-  const isDev = process.env.NODE_ENV !== 'production';
-  return {
-    mode: isDev ? 'development' : 'production',
-    color: isDev ? c.yellow : c.green,
-  };
-};
+const modeColors = { development: c.yellow, production: c.green, handoff: c.cyan };
+const getEnvInfo = () => ({ mode: env.mode, color: modeColors[env.mode] ?? c.white });
 
 export const logBuildStart = (done) => {
-  const env = getEnvInfo();
+  const info = getEnvInfo();
   buildStartTime = Date.now();
 
   console.log('');
   console.log(divider());
   console.log('');
   console.log(`  ${c.cyan}◆${c.reset} ${c.bold}${pkg.name}${c.reset} ${c.dim}v${pkg.version}${c.reset}`);
-  console.log(`  ${c.dim}Mode:${c.reset} ${env.color}${env.mode}${c.reset}`);
+  console.log(`  ${c.dim}Mode:${c.reset} ${info.color}${info.mode}${c.reset}`);
   console.log('');
   console.log(divider());
   console.log('');
@@ -42,13 +38,31 @@ export const logBuildStart = (done) => {
   done();
 };
 
+/**
+ * Final build step. Fails the gulp run (exit code 1) when any task reported
+ * an error — a broken Sass file or include must never produce a "successful"
+ * build with missing output. Watch mode never reaches this step.
+ */
 export const logBuildEnd = (done) => {
   const elapsed = Date.now() - buildStartTime;
   const seconds = (elapsed / 1000).toFixed(2);
+  const errors = app.build?.errors ?? 0;
 
   console.log('');
   console.log(divider());
   console.log('');
+
+  if (errors > 0) {
+    console.log(
+      `  ${c.red}✗${c.reset} ${c.bold}Build failed${c.reset} ${c.dim}— ${errors} error(s) in ${seconds}s${c.reset}`
+    );
+    console.log('');
+    console.log(divider());
+    console.log('');
+    done(new Error(`Build failed with ${errors} error(s)`));
+    return;
+  }
+
   console.log(`  ${c.green}✓${c.reset} ${c.bold}Build completed${c.reset} ${c.dim}in ${seconds}s${c.reset}`);
   console.log(`  ${c.dim}Output:${c.reset} ${c.cyan}./${app.paths.build}/${c.reset}`);
   console.log('');
@@ -58,7 +72,7 @@ export const logBuildEnd = (done) => {
 };
 
 export const logServerStart = (port, externalUrl) => {
-  const env = getEnvInfo();
+  const info = getEnvInfo();
 
   console.log('');
   console.log(divider());
@@ -69,7 +83,7 @@ export const logServerStart = (port, externalUrl) => {
   if (externalUrl) {
     console.log(`  ${c.cyan}▸${c.reset} Network: ${c.bold}${externalUrl}${c.reset}`);
   }
-  console.log(`  ${c.cyan}▸${c.reset} Mode:    ${env.color}${env.mode}${c.reset}`);
+  console.log(`  ${c.cyan}▸${c.reset} Mode:    ${info.color}${info.mode}${c.reset}`);
   console.log('');
   console.log(divider());
   console.log('');
@@ -86,4 +100,13 @@ export const logWarning = (message) => {
 export const logError = (title, error) => {
   const message = error?.message || String(error);
   console.log(`  ${c.red}✗${c.reset} ${c.bold}${title}${c.reset} ${c.red}${message}${c.reset}`);
+};
+
+/**
+ * Record a task failure. Logs it and counts it so `logBuildEnd` can fail
+ * one-shot builds; in watch mode the count is informational only.
+ */
+export const reportFailure = (title, error) => {
+  logError(title, error);
+  if (app.build) app.build.errors += 1;
 };

@@ -16,8 +16,6 @@ export const images = () => {
     .pipe(plugins.browserSync.stream());
 };
 
-const rasterSources = () => `${app.paths.srcImages}/**/*.{jpg,jpeg,png}`;
-
 export const imagesWebp = () => {
   const { gulp, paths, config } = app;
 
@@ -26,7 +24,7 @@ export const imagesWebp = () => {
   }
 
   return gulp
-    .src(rasterSources(), { encoding: false, since: gulp.lastRun(imagesWebp) })
+    .src(paths.globs.rasters, { encoding: false, since: gulp.lastRun(imagesWebp) })
     .pipe(imageToFormat('webp', { quality: config.images.webp.quality ?? 80 }))
     .pipe(sizeReporter('WebP', { showFiles: false }))
     .pipe(gulp.dest(paths.buildImages));
@@ -40,7 +38,7 @@ export const imagesAvif = () => {
   }
 
   return gulp
-    .src(rasterSources(), { encoding: false, since: gulp.lastRun(imagesAvif) })
+    .src(paths.globs.rasters, { encoding: false, since: gulp.lastRun(imagesAvif) })
     .pipe(imageToFormat('avif', { quality: config.images.avif.quality ?? 60 }))
     .pipe(sizeReporter('AVIF', { showFiles: false }))
     .pipe(gulp.dest(paths.buildImages));

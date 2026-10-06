@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  # Supersede stale PR runs only — never cancel a run on main.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  HUSKY: 0
+
+jobs:
+  quality:
+    name: Lint · Format · Build · Dist smoke test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint (ESLint + Stylelint)
+        run: pnpm lint && pnpm lint:css
+
+      - name: Format check (Prettier)
+        run: pnpm format:check
+
+      # Advisory only (|| true): a brand-new upstream advisory must not block
+      # unrelated PRs, but vulnerabilities stay visible in every run's log.
+      - name: Audit dependencies (advisory)
+        run: pnpm audit --audit-level=high || true
+
+      - name: Production build + smoke test
+        run: pnpm build:prod && node scripts/check-dist.mjs --mode=prod
+
+      - name: Handoff build + smoke test
+        run: pnpm build:handoff && node scripts/check-dist.mjs --mode=handoff

@@ -1,4 +1,5 @@
 import fs from 'node:fs/promises';
+import { createRequire } from 'node:module';
 import path from 'node:path';
 import { logSuccess, logWarning } from '../utils/index.js';
 
@@ -13,7 +14,9 @@ npm run css
 \`\`\`
 
 Tailwind v4 auto-detects content in this folder (\`node_modules\` ignored).
-Theme tokens live in \`tailwind.css\` (\`@theme\`).
+Theme tokens live in \`tailwind.css\` (\`@theme\`). Run it from the theme
+folder itself — Tailwind skips paths listed in a parent \`.gitignore\`, so a
+\`dist/\` still inside the source repo produces no utilities.
 
 ## Dev mode (no rebuild needed)
 
@@ -30,8 +33,19 @@ Dev only — always \`npm run css\` before going live.
 
 /**
  * WordPress handoff kit: makes dist/ self-sufficient for style rebuilds.
- * Emitted only for production builds with Tailwind active.
+ * Emitted only for production/handoff builds with Tailwind active.
+ * Kit versions are pinned to the Tailwind version the source project uses,
+ * so the rebuild inside the theme matches the shipped CSS.
  */
+const installedTailwindRange = () => {
+  try {
+    const { version } = createRequire(import.meta.url)('tailwindcss/package.json');
+    return `^${version}`;
+  } catch {
+    return '^4';
+  }
+};
+
 export const tailwindKit = async () => {
   const { paths, config } = app;
 
@@ -60,8 +74,8 @@ export const tailwindKit = async () => {
       css: 'tailwindcss -i ./tailwind.css -o ./styles/tailwind.css --minify',
     },
     devDependencies: {
-      '@tailwindcss/cli': '^4',
-      tailwindcss: '^4',
+      '@tailwindcss/cli': installedTailwindRange(),
+      tailwindcss: installedTailwindRange(),
     },
   };
 

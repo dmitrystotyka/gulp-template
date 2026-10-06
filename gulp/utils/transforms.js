@@ -2,7 +2,8 @@
  * Content Transforms
  * Small object-mode Transform streams replacing single-purpose gulp plugins
  * (gulp-prettier, gulp-terser, gulp-csso, gulp-webp).
- * All of them catch their own errors so `gulp watch` survives.
+ * All of them catch their own errors so `gulp watch` survives; the failure
+ * is recorded so one-shot builds still exit 1 (see logBuildEnd).
  */
 
 import { Transform } from 'node:stream';
@@ -13,7 +14,7 @@ import { minify as terserMinify } from 'terser';
 import { transform as lightningcss } from 'lightningcss';
 import { optimize as svgoOptimizeRaw } from 'svgo';
 import sharp from 'sharp';
-import { logWarning } from './logger.js';
+import { reportFailure } from './logger.js';
 
 const contentTransform = (name, handler) =>
   new Transform({
@@ -25,7 +26,7 @@ const contentTransform = (name, handler) =>
         await handler(file);
         callback(null, file);
       } catch (error) {
-        logWarning(`${name} failed for ${path.basename(file.path)}: ${error.message}`);
+        reportFailure(`${name} (${path.basename(file.path)})`, error);
         callback(null, file);
       }
     },
@@ -37,31 +38,32 @@ const contentTransform = (name, handler) =>
 
 let prettierOptions;
 
+// Formats with the project's own Prettier config (.prettierrc.json) so the
+// built HTML looks exactly like hand-written source — no overrides that
+// could add/remove whitespace between inline elements.
 export const htmlPrettify = () =>
   contentTransform('HTML formatting', async (file) => {
     prettierOptions ??= (await resolveConfig(file.path)) || {};
     const formatted = await format(file.contents.toString(), {
       ...prettierOptions,
       parser: 'html',
-      htmlWhitespaceSensitivity: 'ignore',
     });
     file.contents = Buffer.from(formatted);
   });
 
+// Conservative on purpose: nothing that changes the DOM a stylesheet or
+// script could depend on (attribute order stays, `type="text"` stays).
 export const htmlMinify = () =>
   contentTransform('HTML minification', async (file) => {
     const minified = await htmlMinifyRaw(file.contents.toString(), {
       collapseWhitespace: true,
       conservativeCollapse: true,
       removeComments: true,
-      removeRedundantAttributes: true,
       removeScriptTypeAttributes: true,
       removeStyleLinkTypeAttributes: true,
       useShortDoctype: true,
       minifyCSS: true,
       minifyJS: true,
-      sortAttributes: true,
-      sortClassName: false,
     });
     file.contents = Buffer.from(minified);
   });
@@ -74,10 +76,34 @@ export const replaceContents = (search, replacement) =>
     file.contents = Buffer.from(file.contents.toString().split(search).join(replacement));
   });
 
+/**
+ * Page-level SEO metadata that only the build knows:
+ * - `__PAGE_URL__` → absolute URL of this page (canonical / og:url);
+ * - relative `og:image` / `twitter:image` paths → absolute (social crawlers
+ *   require absolute image URLs).
+ */
+export const pageMeta = (siteUrl) =>
+  contentTransform('Page metadata', (file) => {
+    const relative = file.relative.replace(/\\/g, '/');
+    const route = relative === 'index.html' ? '' : relative.replace(/\.html$/, '');
+    const pageUrl = `${siteUrl}/${route}`;
+
+    const html = file.contents
+      .toString()
+      .split('__PAGE_URL__')
+      .join(pageUrl)
+      .replace(/(<meta\s+(?:property|name)="(?:og:image|twitter:image)"\s+content=")\.?\/(?!\/)/g, `$1${siteUrl}/`);
+
+    file.contents = Buffer.from(html);
+  });
+
 // ─────────────────────────────────────────────────────────────
 // JS / CSS
 // ─────────────────────────────────────────────────────────────
 
+// No `pure_funcs`/`drop_console`: minified code must behave exactly like the
+// readable handoff build — stripping console calls is a product decision,
+// not a build default.
 export const jsMinify = () =>
   contentTransform('JS minification', async (file) => {
     const result = await terserMinify(
@@ -85,10 +111,7 @@ export const jsMinify = () =>
       {
         module: true,
         format: { comments: false },
-        compress: {
-          drop_debugger: true,
-          pure_funcs: ['console.log', 'console.info', 'console.debug'],
-        },
+        compress: { drop_debugger: true },
         ...(file.sourceMap ? { sourceMap: { content: file.sourceMap, filename: file.relative } } : {}),
       }
     );
@@ -110,7 +133,7 @@ export const cssMinify = () =>
 // Images (sharp / svgo)
 // ─────────────────────────────────────────────────────────────
 
-const RASTER_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp', '.gif'];
+const RASTER_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.avif'];
 
 export const sharpOptimize = () =>
   contentTransform('Image optimization', async (file) => {
@@ -139,6 +162,11 @@ export const sharpOptimize = () =>
       case '.webp':
         optimized = await sharp(file.contents)
           .webp({ quality: config.images.webp?.quality ?? 80 })
+          .toBuffer();
+        break;
+      case '.avif':
+        optimized = await sharp(file.contents)
+          .avif({ quality: config.images.avif?.quality ?? 60 })
           .toBuffer();
         break;
       case '.gif':
@@ -184,7 +212,7 @@ export const imageToFormat = (imageFormat, options = {}) =>
         file.extname = `.${imageFormat}`;
         callback(null, file);
       } catch (error) {
-        logWarning(`${imageFormat} conversion failed for ${path.basename(file.path)}: ${error.message}`);
+        reportFailure(`${imageFormat} conversion (${path.basename(file.path)})`, error);
         callback();
       }
     },

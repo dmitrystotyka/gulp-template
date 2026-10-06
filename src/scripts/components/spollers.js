@@ -140,7 +140,7 @@ class Spollers {
     const container = trigger.closest(SELECTORS.container);
     const isOneSpoller = container.hasAttribute('data-one-spoller');
 
-    // Блокируем пока идёт анимация
+    // Ignore clicks while the animation is running
     if (container.querySelectorAll(`.${CLASSES.sliding}`).length) return;
 
     if (isOneSpoller && !trigger.classList.contains(CLASSES.active)) {

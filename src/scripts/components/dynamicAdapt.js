@@ -1,22 +1,22 @@
 /**
  * Dynamic Adapt
  *
- * Перемещает элементы в DOM при указанном брейкпоинте.
+ * Moves elements around the DOM at a given breakpoint.
  *
- * Формат: data-da="селектор, брейкпоинт, [...опции]"
- *   селектор   — CSS-селектор контейнера назначения (обязательный)
- *   брейкпоинт — ширина в px (по умолчанию 767)
- *   опции      — порядок НЕ важен, автоопределение:
- *     min | max            → тип брейкпоинта (по умолчанию max)
- *     first | last | число → позиция в контейнере (по умолчанию last)
+ * Format: data-da="selector, breakpoint, [...options]"
+ *   selector   — CSS selector of the destination container (required)
+ *   breakpoint — width in px (default 767)
+ *   options    — order does NOT matter, detected by value:
+ *     min | max             → breakpoint type (default max)
+ *     first | last | number → position inside the container (default last)
  *
- * Примеры:
- *   data-da=".footer, 768"              → в конец .footer при ≤768px
- *   data-da=".sidebar, 1024, first"     → в начало .sidebar при ≤1024px
- *   data-da=".nav, 768, min"            → в конец .nav при ≥768px
- *   data-da=".nav, 768, min, first"     → в начало .nav при ≥768px
- *   data-da=".nav, 768, first, min"     → то же самое (порядок не важен)
- *   data-da=".target, 480, 2"           → перед 3-м дочерним при ≤480px
+ * Examples:
+ *   data-da=".footer, 768"              → to the end of .footer at ≤768px
+ *   data-da=".sidebar, 1024, first"     → to the start of .sidebar at ≤1024px
+ *   data-da=".nav, 768, min"            → to the end of .nav at ≥768px
+ *   data-da=".nav, 768, min, first"     → to the start of .nav at ≥768px
+ *   data-da=".nav, 768, first, min"     → same thing (order is irrelevant)
+ *   data-da=".target, 480, 2"           → before the 3rd child at ≤480px
  */
 
 const SELECTOR = '[data-da]';
@@ -33,7 +33,7 @@ class DynamicAdapt {
   }
 
   /**
-   * Парсит параметры из data-da с автоопределением типа и позиции.
+   * Parse data-da parameters, detecting type and position by value.
    */
   _parseOptions(data) {
     const parts = data.split(',').map((s) => s.trim());
@@ -43,7 +43,7 @@ class DynamicAdapt {
     let place = 'last';
     let type = 'max';
 
-    // Остальные параметры — автоопределение по значению
+    // Remaining parameters are detected by value
     for (let idx = 2; idx < parts.length; idx++) {
       const val = parts[idx];
 
@@ -86,7 +86,7 @@ class DynamicAdapt {
       });
     });
 
-    // Группируем по уникальным комбинациям "тип + брейкпоинт"
+    // Group by unique "type + breakpoint" combinations
     const groups = new Map();
 
     this.objects.forEach((obj) => {
@@ -95,13 +95,13 @@ class DynamicAdapt {
       groups.get(key).push(obj);
     });
 
-    // Сортируем внутри каждой группы
+    // Sort inside each group
     groups.forEach((items) => {
       const type = items[0].type;
       items.sort((a, b) => (type === 'min' ? a.breakpoint - b.breakpoint : b.breakpoint - a.breakpoint));
     });
 
-    // Создаём медиа-слушатели
+    // Create media query listeners
     this._mediaListeners = [];
 
     groups.forEach((items, key) => {

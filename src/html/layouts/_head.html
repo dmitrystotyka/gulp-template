@@ -3,9 +3,12 @@
 
 <title>@@title</title>
 <meta name="description" content="@@description" />
+<!-- Canonical URL and og:url are resolved by the build from SITE_URL + page path -->
+<link rel="canonical" href="__PAGE_URL__" />
 
-<!-- Open Graph -->
+<!-- Open Graph (image paths are made absolute by the build) -->
 <meta property="og:type" content="website" />
+<meta property="og:url" content="__PAGE_URL__" />
 <meta property="og:title" content="@@title" />
 <meta property="og:description" content="@@description" />
 <meta property="og:image" content="@@image" />

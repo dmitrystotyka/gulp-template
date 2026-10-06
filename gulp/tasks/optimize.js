@@ -9,7 +9,7 @@ export const sitemap = async () => {
     return;
   }
 
-  const hostname = config.server.hostname;
+  const hostname = config.site.url;
   const buildDir = paths.build;
   const allFiles = await fs.readdir(buildDir, { recursive: true });
   const htmlFiles = allFiles.filter((f) => f.endsWith('.html')).map((f) => path.join(buildDir, f));
@@ -52,7 +52,7 @@ export const robots = async () => {
   const lines = ['User-agent: *', 'Allow: /', 'Disallow: /404.html'];
 
   if (config.optimization.sitemap) {
-    lines.push('', `Sitemap: ${config.server.hostname}/sitemap.xml`);
+    lines.push('', `Sitemap: ${config.site.url}/sitemap.xml`);
   }
 
   await fs.writeFile(path.join(paths.build, 'robots.txt'), `${lines.join('\n')}\n`, 'utf-8');

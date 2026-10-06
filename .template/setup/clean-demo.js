@@ -13,13 +13,13 @@ const DEMO_COMPONENT = 'src/html/components/demo.html';
 const INDEX_PAGE = 'src/html/pages/index.html';
 
 const INDEX_SKELETON = `<!doctype html>
-<html lang="en">
+<html lang="@@lang">
   <head>
     <!-- prettier-ignore -->
     @@include('layouts/_head.html', {
       "title": "Home",
       "description": "",
-      "image": ""
+      "image": "./assets/img/previews/global.webp"
     })
   </head>
 

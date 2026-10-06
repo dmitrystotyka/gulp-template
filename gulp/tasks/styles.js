@@ -16,7 +16,7 @@ export const styles = () => {
 
   const postcssPlugins = [
     autoprefixer(),
-    ...(config.env.isProd ? [sortMediaQueries()] : []),
+    ...(config.optimization.sortMediaQueries ? [sortMediaQueries()] : []),
     ...(config.postcss?.plugins || []),
   ];
 
@@ -24,7 +24,9 @@ export const styles = () => {
     .src(src, { sourcemaps: config.sourceMaps })
     .pipe(
       sass({
-        logger: sassEmbedded.Logger.silent,
+        // Own `@warn`/`@debug` and Dart Sass deprecation notices stay visible
+        // (they announce breaking changes); noise from node_modules is muted.
+        quietDeps: true,
         loadPaths: [paths.src, 'node_modules'],
       }).on('error', handleError('Styles'))
     )

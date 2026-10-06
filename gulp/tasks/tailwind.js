@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import postcss from 'gulp-postcss';
-import { sizeReporter, handleError, cssMinify, streamToPromise, logWarning } from '../utils/index.js';
+import { sizeReporter, handleError, cssMinify, streamToPromise, reportFailure } from '../utils/index.js';
 
 /**
  * Extract the @theme block from src/styles/tailwind.css
@@ -31,7 +31,7 @@ export const tailwind = async () => {
   try {
     ({ default: tailwindPostcss } = await import('@tailwindcss/postcss'));
   } catch {
-    logWarning('Tailwind is active but @tailwindcss/postcss is not installed — run: pnpm tailwind:setup');
+    reportFailure('Tailwind', new Error('active but @tailwindcss/postcss is not installed — run: pnpm tailwind:setup'));
     return;
   }
 

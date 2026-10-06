@@ -29,9 +29,13 @@ html {
   *,
   *::before,
   *::after {
+    /* stylelint-disable-next-line declaration-no-important -- intentional override */
     animation-duration: 0.01ms !important;
+    /* stylelint-disable-next-line declaration-no-important -- intentional override */
     animation-iteration-count: 1 !important;
+    /* stylelint-disable-next-line declaration-no-important -- intentional override */
     transition-duration: 0.01ms !important;
+    /* stylelint-disable-next-line declaration-no-important -- intentional override */
     scroll-behavior: auto !important;
   }
 }
@@ -164,6 +168,7 @@ ol {
 /* Author display rules must never defeat the hidden attribute
    (spollers.js and others toggle it) */
 [hidden] {
+  /* stylelint-disable-next-line declaration-no-important -- intentional override */
   display: none !important;
 }
 

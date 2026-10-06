@@ -27,7 +27,9 @@ const extensions = {
   styles: 'scss',
   scripts: 'js',
   html: 'html',
-  images: '{jpg,jpeg,png,gif,ico,webp,svg}',
+  // Case variants on purpose: camera/Figma exports are often .JPG/.PNG and the glob is case-sensitive
+  images: '{jpg,jpeg,png,gif,ico,webp,avif,svg,JPG,JPEG,PNG,GIF,WEBP,AVIF,SVG}',
+  rasters: '{jpg,jpeg,png,JPG,JPEG,PNG}',
   sprites: 'svg',
 };
 
@@ -42,9 +44,7 @@ const computedPaths = {
   srcAssets: `${folders.src}/${folders.assets}`,
   srcImages: `${folders.src}/${folders.assets}/${folders.images}`,
   srcSprites: `${folders.src}/${folders.assets}/${folders.sprites}`,
-  srcHtmlLayouts: `${folders.src}/${folders.html}/${folders.layouts}`,
   srcHtmlPages: `${folders.src}/${folders.html}/${folders.pages}`,
-  srcHtmlComponents: `${folders.src}/${folders.html}/${folders.components}`,
   buildStyles: `${folders.build}/${folders.styles}`,
   buildScripts: `${folders.build}/${folders.scripts}`,
   buildAssets: `${folders.build}/${folders.assets}`,
@@ -62,6 +62,7 @@ const globs = {
   stylesWatch: `${computedPaths.srcStyles}/**/*.${extensions.styles}`,
   scripts: `${computedPaths.srcScripts}/**/*.${extensions.scripts}`,
   images: `${computedPaths.srcImages}/**/*.${extensions.images}`,
+  rasters: `${computedPaths.srcImages}/**/*.${extensions.rasters}`,
   sprites: `${computedPaths.srcSprites}/**/*.${extensions.sprites}`,
   assets: [
     `${computedPaths.srcAssets}/**/*`,

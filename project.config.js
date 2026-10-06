@@ -8,14 +8,28 @@
 
 import { env } from './gulp/configs/env.js';
 
-const { isDev, isProd } = env;
+const { isDev, isProd, isHandoff } = env;
+
+// Minified output belongs to `build:prod` only. `build:handoff` (the WordPress
+// deliverable) keeps HTML/CSS/JS readable while still optimizing images.
+const minifyCode = isProd && !isHandoff;
 
 export const projectConfig = {
   // ─────────────────────────────────────────────────────────
   // Environment
   // ─────────────────────────────────────────────────────────
 
-  env: { isDev, isProd },
+  env: { isDev, isProd, isHandoff },
+
+  // ─────────────────────────────────────────────────────────
+  // Site — public URL (SITE_URL from .env, falls back to http://localhost:<port>)
+  // and the document language passed to pages as `@@lang`.
+  // ─────────────────────────────────────────────────────────
+
+  site: {
+    url: env.siteUrl,
+    lang: 'en',
+  },
 
   // ─────────────────────────────────────────────────────────
   // Dev Server (BrowserSync)
@@ -23,8 +37,7 @@ export const projectConfig = {
 
   server: {
     port: env.port, // PORT from .env
-    hostname: env.siteUrl, // SITE_URL from .env, falls back to http://localhost:<port>
-    open: true, // open browser on `pnpm dev`
+    open: env.openBrowser, // open browser on `pnpm dev` (BROWSER=none disables)
   },
 
   // ─────────────────────────────────────────────────────────
@@ -35,12 +48,15 @@ export const projectConfig = {
 
   optimization: {
     minify: {
-      // Tip: hand-editable dist (e.g. WordPress handoff) → set these to false
-      html: isProd,
-      css: isProd,
-      js: isProd,
+      html: minifyCode,
+      css: minifyCode,
+      js: minifyCode,
       images: isProd,
     },
+    // Moves every media query to the end of each stylesheet (smaller gzip).
+    // Off for handoff: it separates rules from their responsive overrides,
+    // which is exactly what a hand-editing developer does not want.
+    sortMediaQueries: minifyCode,
     criticalCSS: false, // inline compiled critical.scss into <head> of every page
     sitemap: false, // generate sitemap.xml
     robots: false, // generate robots.txt
@@ -110,7 +126,9 @@ export const projectConfig = {
 
   // ─────────────────────────────────────────────────────────
   // PostCSS — additional plugins (applied after Autoprefixer)
-  // Example: [require('postcss-custom-media')]
+  // Example (this file is an ES module):
+  //   import postcssCustomMedia from 'postcss-custom-media';
+  //   postcss: { plugins: [postcssCustomMedia()] }
   // ─────────────────────────────────────────────────────────
 
   postcss: {

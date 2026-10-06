@@ -1,15 +1,15 @@
 import js from '@eslint/js';
-import prettier from 'eslint-plugin-prettier';
 import prettierConfig from 'eslint-config-prettier';
 import globals from 'globals';
 
+// Prettier is NOT run as an ESLint rule: formatting is checked by
+// `pnpm format:check` (and fixed by lint-staged) — one tool per job keeps
+// `pnpm lint` fast and the error output readable.
 export default [
   js.configs.recommended,
   prettierConfig,
   {
-    plugins: { prettier },
     rules: {
-      'prettier/prettier': 'warn',
       'no-unused-vars': 'warn',
       'no-var': 'error',
       'prefer-const': 'warn',
@@ -31,7 +31,7 @@ export default [
   },
   // Node / Gulp scripts
   {
-    files: ['gulpfile.js', 'gulp/**/*.js', 'project.config.js', '.template/**/*.js'],
+    files: ['gulpfile.js', 'gulp/**/*.js', 'project.config.js', '.template/**/*.js', 'scripts/**/*.{js,mjs}'],
     languageOptions: {
       globals: {
         ...globals.node,
@@ -43,6 +43,6 @@ export default [
     },
   },
   {
-    ignores: ['dist/**', 'node_modules/**', '*.min.js', '*.d.ts'],
+    ignores: ['dist/**', 'node_modules/**', '*.min.js'],
   },
 ];

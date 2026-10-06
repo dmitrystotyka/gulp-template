@@ -14,18 +14,14 @@ import { logWarning } from './logger.js';
 export const createUnlinkHandler = (srcBase, buildBase, extMap = {}, siblingExts = []) => {
   return (filePath) => {
     try {
-      let relativePath = path.relative(srcBase, filePath);
-      const ext = path.extname(relativePath);
-
-      if (extMap[ext]) {
-        relativePath = relativePath.replace(ext, extMap[ext]);
-      }
-
-      const buildPath = path.join(buildBase, relativePath);
+      const relative = path.parse(path.relative(srcBase, filePath));
+      // Swap only the extension itself — never string-replace inside the path
+      const ext = extMap[relative.ext] ?? relative.ext;
+      const buildPath = path.join(buildBase, relative.dir, `${relative.name}${ext}`);
       const targets = [buildPath, `${buildPath}.map`];
 
       for (const siblingExt of siblingExts) {
-        targets.push(buildPath.replace(path.extname(buildPath), siblingExt));
+        targets.push(path.join(buildBase, relative.dir, `${relative.name}${siblingExt}`));
       }
 
       for (const target of targets) {

@@ -1,14 +1,14 @@
 /* global Swiper */
 
 /**
- * Конфигурация слайдеров.
+ * Slider configuration (Swiper — load it via `vendors` in project.config.js).
  *
- * Упрощённые опции (разворачиваются автоматически):
- *   loop:       true | false          — зацикливание (по умолчанию false)
- *   pagination: true | false | {}     — пагинация (true = стандартная, {} = кастомная, false = нет)
- *   navigation: true | false | {}     — стрелки   (true = стандартные, {} = кастомные, false = нет)
+ * Shorthand options (expanded automatically):
+ *   loop:       true | false          — looping (default false; true only when > 1 slide)
+ *   pagination: true | false | {}     — bullets (true = default element, {} = custom options, false = none)
+ *   navigation: true | false | {}     — arrows  (true = default elements, {} = custom options, false = none)
  *
- * Всё остальное — обычные опции Swiper.
+ * Everything else is passed to Swiper as-is.
  */
 const sliderConfigs = {
   // '.example-slider': {
@@ -78,8 +78,8 @@ class Sliders {
   }
 
   /**
-   * Разворачивает упрощённые опции (pagination, navigation, loop)
-   * в полноценную конфигурацию Swiper.
+   * Expand the shorthand options (pagination, navigation, loop)
+   * into a full Swiper configuration.
    */
   _resolveConfig(sliderEl, userConfig) {
     const { pagination, navigation, loop, ...rest } = userConfig;
@@ -102,7 +102,7 @@ class Sliders {
       config.loop = Boolean(loop);
     }
 
-    // Pagination: true → стандартная, {} → кастомная
+    // Pagination: true → default element, {} → custom options
     if (pagination === true) {
       config.pagination = {
         el: sliderEl.querySelector('.swiper-pagination') || '.swiper-pagination',
@@ -112,7 +112,7 @@ class Sliders {
       config.pagination = { clickable: true, ...pagination };
     }
 
-    // Navigation: true → стандартная, {} → кастомная
+    // Navigation: true → default elements, {} → custom options
     if (navigation === true) {
       config.navigation = {
         nextEl: sliderEl.querySelector('.swiper-button-next') || '.swiper-button-next',
@@ -126,8 +126,8 @@ class Sliders {
   }
 
   /**
-   * Скрывает/показывает навигацию и пагинацию,
-   * если слайдов недостаточно для прокрутки.
+   * Hide navigation, pagination and scrollbar when there are not enough
+   * slides to scroll (Swiper reports this as `isLocked`).
    */
   _toggleOverflow(swiper) {
     const { el } = swiper;
@@ -135,7 +135,7 @@ class Sliders {
 
     el.classList.toggle('swiper--overflow', isOverflow);
 
-    // Скрыть/показать стрелки
+    // Arrows
     if (swiper.navigation) {
       const { nextEl, prevEl } = swiper.navigation;
       [nextEl, prevEl].flat().forEach((arrow) => {
@@ -143,7 +143,7 @@ class Sliders {
       });
     }
 
-    // Скрыть/показать пагинацию
+    // Pagination
     if (swiper.pagination?.el) {
       const paginationEls = Array.isArray(swiper.pagination.el) ? swiper.pagination.el : [swiper.pagination.el];
       paginationEls.forEach((pagEl) => {
@@ -151,7 +151,7 @@ class Sliders {
       });
     }
 
-    // Скрыть/показать скроллбар
+    // Scrollbar
     if (swiper.scrollbar?.el) {
       const scrollbarEls = Array.isArray(swiper.scrollbar.el) ? swiper.scrollbar.el : [swiper.scrollbar.el];
       scrollbarEls.forEach((sbEl) => {

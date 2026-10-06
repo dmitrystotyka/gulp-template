@@ -1,7 +1,7 @@
 import { PassThrough } from 'node:stream';
 import { finished } from 'node:stream/promises';
 import size from 'gulp-size';
-import { logError } from './logger.js';
+import { reportFailure } from './logger.js';
 
 export const sizeReporter = (title, options = {}) => {
   const { config } = app;
@@ -20,14 +20,15 @@ export const sizeReporter = (title, options = {}) => {
 
 /**
  * Error handler for failure-prone plugin streams (Sass, PostCSS, file-include).
- * Logs the error, rings the terminal bell and ends the stream
- * so `gulp watch` survives instead of crashing.
+ * Logs the error, rings the terminal bell, records the failure (one-shot
+ * builds exit 1 in `logBuildEnd`) and ends the stream so `gulp watch`
+ * survives instead of crashing.
  *
  * Usage: .pipe(somePlugin().on('error', handleError('Styles')))
  */
 export const handleError = (title) =>
   function (error) {
-    logError(title, error);
+    reportFailure(title, error);
     process.stdout.write('\x07');
     this.emit('end');
   };

@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
-import { logSuccess, logWarning } from '../utils/index.js';
+import { logSuccess, reportFailure } from '../utils/index.js';
 
 /**
  * Copy prebuilt library files from node_modules into dist so the handoff
@@ -20,7 +20,10 @@ export const vendors = async () => {
     const srcPath = path.join(paths.root, 'node_modules', from);
 
     if (!existsSync(srcPath)) {
-      logWarning(`Vendor not found: node_modules/${from} — install the package first (pnpm add <package>)`);
+      reportFailure(
+        'Vendors',
+        new Error(`not found: node_modules/${from} — install the package first (pnpm add <package>)`)
+      );
       continue;
     }
 

@@ -25,13 +25,11 @@
   "files.trimTrailingWhitespace": true,
   "files.exclude": {
     "**/node_modules": true,
-    "**/dist": true,
     "**/.DS_Store": true
   },
 
   // ── Search ─────────────────────────────────────────────────
   "search.exclude": {
-    "**/dist": true,
     "**/pnpm-lock.yaml": true
   }
 }

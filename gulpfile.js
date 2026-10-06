@@ -12,8 +12,9 @@ import { paths } from './gulp/configs/paths.js';
 import { plugins } from './gulp/configs/plugins.js';
 import { config } from './gulp/configs/config.js';
 
-// Global app object
-globalThis.app = { gulp, paths, plugins, config };
+// Global app object. `build.errors` is incremented by every recorded task
+// failure (handleError / reportFailure); one-shot builds fail on it.
+globalThis.app = { gulp, paths, plugins, config, build: { errors: 0 } };
 
 // Tasks
 import { clean } from './gulp/tasks/clean.js';
@@ -60,7 +61,8 @@ const watch = () => {
   }
 
   if (config.optimization.criticalCSS) {
-    gulp.watch(`${paths.srcStyles}/critical.scss`, htmlAll);
+    // critical.scss plus every partial it may @use (vars, mixins, …)
+    gulp.watch([`${paths.srcStyles}/critical.scss`, `${paths.srcStyles}/**/_*.scss`], htmlAll);
   }
 };
 
@@ -76,12 +78,14 @@ const seoTasks = gulp.series(sitemap, robots);
 // Commands
 // ─────────────────────────────────────────────────────────────
 
+const fullBuild = gulp.series(logBuildStart, clean, mainTasks, gulp.parallel(seoTasks, tailwindKit), logBuildEnd);
+
 gulp.task('dev', gulp.series(logBuildStart, clean, mainTasks, gulp.parallel(watch, server)));
 gulp.task('build:dev', gulp.series(logBuildStart, clean, mainTasks, logBuildEnd));
-gulp.task(
-  'build:prod',
-  gulp.series(logBuildStart, clean, mainTasks, gulp.parallel(seoTasks, tailwindKit), logBuildEnd)
-);
+// build:prod and build:handoff share the pipeline — the difference lives in
+// project.config.js (minify/sortMediaQueries off for handoff via BUILD_TARGET).
+gulp.task('build:prod', fullBuild);
+gulp.task('build:handoff', fullBuild);
 gulp.task('preview', server);
 
 // Graceful shutdown — close BrowserSync and free port

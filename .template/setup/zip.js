@@ -1,9 +1,10 @@
 /**
  * Handoff Archive Script
- * Run: pnpm zip (builds prod first)
+ * Run: pnpm zip (runs build:handoff + check-dist first)
  *
  * Archives dist/ into <project-name>-<YYYY-MM-DD>.zip at the project root.
- * No dependencies: system `zip` on macOS/Linux, Compress-Archive on Windows.
+ * No dependencies: `tar -a` (bsdtar) ships with macOS, Linux and Windows 10+
+ * and writes a portable zip (forward slashes, no OS junk files).
  */
 
 import { execFileSync } from 'node:child_process';
@@ -13,7 +14,7 @@ import { resolvePath } from '../paths.js';
 const dist = resolvePath('dist');
 
 if (!existsSync(dist)) {
-  console.error('\n  ✗ dist/ not found — run pnpm build:prod first\n');
+  console.error('\n  ✗ dist/ not found — run pnpm build:handoff first\n');
   process.exit(1);
 }
 
@@ -25,16 +26,11 @@ const archivePath = resolvePath(archiveName);
 rmSync(archivePath, { force: true });
 
 try {
-  if (process.platform === 'win32') {
-    execFileSync(
-      'powershell',
-      ['-NoProfile', '-Command', `Compress-Archive -Path dist\\* -DestinationPath '${archivePath}' -Force`],
-      { stdio: 'inherit' }
-    );
-  } else {
-    // cwd: dist — archive contents land at the zip root (no dist/ prefix)
-    execFileSync('zip', ['-r', '-q', archivePath, '.'], { cwd: dist, stdio: 'inherit' });
-  }
+  // -a picks the format from the extension (.zip); -C dist . → contents land
+  // at the archive root without a dist/ prefix.
+  execFileSync('tar', ['-a', '-cf', archivePath, '--exclude', '.DS_Store', '--exclude', 'Thumbs.db', '-C', dist, '.'], {
+    stdio: 'inherit',
+  });
 } catch (error) {
   console.error(`\n  ✗ Archiving failed: ${error.message}\n`);
   process.exit(1);

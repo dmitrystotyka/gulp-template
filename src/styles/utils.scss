@@ -72,6 +72,7 @@
   .btn,
   [data-popup],
   [data-popup-close] {
+    /* stylelint-disable-next-line declaration-no-important -- intentional override */
     display: none !important;
   }
 
@@ -87,6 +88,7 @@
   }
 
   img {
+    /* stylelint-disable-next-line declaration-no-important -- intentional override */
     max-width: 100% !important;
     break-inside: avoid;
   }

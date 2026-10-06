@@ -1,0 +1,47 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+      timezone: Etc/UTC
+    open-pull-requests-limit: 10
+    # Mirror pnpm's minimumReleaseAge (3 days) so Dependabot never proposes
+    # a version the lockfile refuses to install.
+    cooldown:
+      default-days: 3
+    labels:
+      - dependencies
+    groups:
+      gulp:
+        patterns:
+          - gulp
+          - 'gulp-*'
+      lint:
+        patterns:
+          - eslint
+          - '@eslint/*'
+          - 'eslint-*'
+          - stylelint
+          - 'stylelint-*'
+          - prettier
+      build:
+        patterns:
+          - sharp
+          - svgo
+          - terser
+          - lightningcss
+          - 'sass-embedded'
+          - 'postcss*'
+          - autoprefixer
+          - html-minifier-terser
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    labels:
+      - ci

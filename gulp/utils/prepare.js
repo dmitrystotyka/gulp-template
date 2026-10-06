@@ -7,8 +7,8 @@ import { fileURLToPath } from 'node:url';
 if (!existsSync('.git')) {
   const projectName = basename(resolve('.'));
 
-  // Remove template-specific files
-  for (const file of ['LICENSE', '.github/workflows']) {
+  // Remove template-specific files (CI + Dependabot stay — they are useful in every project)
+  for (const file of ['LICENSE']) {
     if (existsSync(file)) {
       rmSync(file, { recursive: true });
     }
@@ -21,7 +21,8 @@ if (!existsSync('.git')) {
   delete pkg.description;
   delete pkg.author;
   delete pkg.license;
-  delete pkg.scripts.prepare;
+  // Template cleanup is done — from now on `prepare` only installs git hooks
+  pkg.scripts.prepare = 'husky || true';
   writeFileSync('package.json', `${JSON.stringify(pkg, null, 2)}\n`);
 
   // Self-delete — this script is no longer needed
@@ -31,5 +32,5 @@ if (!existsSync('.git')) {
     // ignore
   }
 
-  console.log(`\n✅ Project "${projectName}" initialized. Run: pnpm dev\n`);
+  console.log(`\n✅ Project "${projectName}" initialized. Run: git init && pnpm prepare && pnpm dev\n`);
 }

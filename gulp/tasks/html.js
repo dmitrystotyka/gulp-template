@@ -1,6 +1,14 @@
 import fileInclude from 'gulp-file-include';
 import { compile } from 'sass-embedded';
-import { sizeReporter, handleError, htmlPrettify, htmlMinify, replaceContents, logWarning } from '../utils/index.js';
+import {
+  sizeReporter,
+  handleError,
+  htmlPrettify,
+  htmlMinify,
+  replaceContents,
+  pageMeta,
+  reportFailure,
+} from '../utils/index.js';
 import { getTailwindTheme } from './tailwind.js';
 
 // Placeholder inside layouts/_tailwind-cdn.html, replaced with the @theme block
@@ -20,7 +28,7 @@ const compileCriticalCss = () => {
       loadPaths: [paths.src, 'node_modules'],
     }).css;
   } catch (error) {
-    logWarning(`Critical CSS compilation failed: ${error.message}`);
+    reportFailure('Critical CSS', error);
     return '';
   }
 };
@@ -29,7 +37,7 @@ const htmlStream = ({ all = false } = {}) => {
   const { gulp, paths, plugins, config } = app;
 
   const tailwindActive = config.tailwind.active;
-  // The CDN dev-mode snippet is only for handoff builds (WordPress etc.) —
+  // The CDN dev-mode snippet is only for handoff/production builds —
   // local `pnpm dev` already rebuilds tailwind.css on the fly.
   const tailwindCdn = tailwindActive && config.env.isProd;
   const criticalCss = config.optimization.criticalCSS;
@@ -42,6 +50,8 @@ const htmlStream = ({ all = false } = {}) => {
         tailwind: tailwindActive,
         tailwindCdn,
         criticalCss,
+        lang: config.site.lang,
+        siteUrl: config.site.url,
       },
     }).on('error', handleError('HTML'))
   );
@@ -53,6 +63,8 @@ const htmlStream = ({ all = false } = {}) => {
   if (tailwindCdn) {
     stream = stream.pipe(replaceContents(TW_THEME_PLACEHOLDER, getTailwindTheme()));
   }
+
+  stream = stream.pipe(pageMeta(config.site.url));
 
   // Minified for production, prettified (readable, hand-editable) otherwise
   stream = stream.pipe(config.optimization.minify.html ? htmlMinify() : htmlPrettify());
