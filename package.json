@@ -35,7 +35,7 @@
     "clean:all": "node -e \"['node_modules', 'dist'].forEach((p) => fs.rmSync(p, { recursive: true, force: true }))\""
   },
   "devDependencies": {
-    "@commitlint/cli": "^21.2.3",
+    "@commitlint/cli": "^21.2.4",
     "@commitlint/config-conventional": "^21.2.3",
     "@eslint/js": "^10.0.1",
     "autoprefixer": "^10.6.1",
