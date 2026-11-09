@@ -3,7 +3,7 @@ import * as sassEmbedded from 'sass-embedded';
 import postcss from 'gulp-postcss';
 import autoprefixer from 'autoprefixer';
 import sortMediaQueries from 'postcss-sort-media-queries';
-import { sizeReporter, handleError, cssMinify } from '../utils/index.js';
+import { sizeReporter, handleError, cssMinify, cssLayers } from '../utils/index.js';
 
 const sass = gulpSass(sassEmbedded);
 
@@ -18,6 +18,8 @@ export const styles = () => {
     autoprefixer(),
     ...(config.optimization.sortMediaQueries ? [sortMediaQueries()] : []),
     ...(config.postcss?.plugins || []),
+    // Last: wraps the finished entry, so Tailwind utilities can override it
+    ...(config.tailwind.active ? [cssLayers()] : []),
   ];
 
   let stream = gulp

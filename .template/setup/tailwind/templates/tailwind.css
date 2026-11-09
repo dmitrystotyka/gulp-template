@@ -1,20 +1,25 @@
 /* ─────────────────────────────────────────────────────────────
- * Tailwind CSS v4 — CSS-first config
- * Docs: https://tailwindcss.com/docs/theme
+ * Tailwind CSS v4 — CSS-first config. Docs: https://tailwindcss.com/docs
  *
- * The block between the tw-theme markers is inlined into pages for
- * the CDN dev mode (WordPress handoff) — keep theme tokens inside it.
- * @source lines stay outside: they only matter for the build.
+ * - No Preflight: src/styles/normalize.scss is the one reset, so SCSS
+ *   components look the same with and without Tailwind.
+ * - Layers: the build puts the SCSS entries into theme/base/components/
+ *   utilities, so a utility class always beats a component rule.
+ * - source(none): only the @source paths below are scanned (relative to
+ *   this file, one per line) → only used classes. The handoff kit
+ *   (dist/tailwind.css) swaps them for the theme's own *.php/*.html/*.js.
  * ───────────────────────────────────────────────────────────── */
 
-@import 'tailwindcss';
+@layer properties, theme, base, components, utilities;
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities) source(none);
+@source '../html/**/*.html';
+@source '../scripts/**/*.js';
 
-/* Content sources (relative to this file) */
-@source '../html';
-@source '../scripts';
+/* Safelist — classes that appear in no file (CMS / editor content), kept in the kit too */
 
-/* tw-theme:start */
+/* @source inline('text-center'); */
+
 @theme {
   --font-sans: 'Roboto', sans-serif;
 }
-/* tw-theme:end */

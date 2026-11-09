@@ -6,24 +6,15 @@
 export const folders = {
   src: 'src',
   styles: 'styles',
-  html: 'html',
-  pages: 'pages',
 };
 
-// ─────────────────────────────────────────────────────────────
-// Packages (Tailwind v4, CSS-first config)
-// ─────────────────────────────────────────────────────────────
-
+// Tailwind v4, CSS-first config. `pnpm remove` uses the bare names.
 export const packages = ['tailwindcss@^4', '@tailwindcss/postcss@^4'];
+export const packageNames = packages.map((spec) => spec.replace(/@[^@/]+$/, ''));
 
-// ─────────────────────────────────────────────────────────────
-// Files created by the setup
-// ─────────────────────────────────────────────────────────────
-
+// Creating this file activates the Tailwind pipeline (tailwind: 'auto' in project.config.js)
 export const files = {
-  // Creating this file activates the Tailwind pipeline (tailwind.enabled: 'auto')
   entry: `${folders.src}/${folders.styles}/tailwind.css`,
-  demo: `${folders.src}/${folders.html}/${folders.pages}/tailwind.html`,
 };
 
 export const urls = {
