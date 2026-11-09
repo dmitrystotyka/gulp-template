@@ -24,7 +24,7 @@
     "tailwind:setup": "node .template/setup/tailwind/setup.js"
   },
   "devDependencies": {
-    "@commitlint/cli": "^21.2.3",
+    "@commitlint/cli": "^21.2.4",
     "@commitlint/config-conventional": "^21.2.3",
     "@eslint/js": "^10.0.1",
     "autoprefixer": "^10.6.1",
