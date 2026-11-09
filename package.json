@@ -33,7 +33,7 @@
     "dotenv": "^18.0.5",
     "eslint": "^10.12.0",
     "eslint-config-prettier": "^10.1.8",
-    "globals": "^17.13.0",
+    "globals": "^17.14.0",
     "gulp": "^5.0.1",
     "gulp-file-include": "^2.3.0",
     "gulp-postcss": "^10.0.0",
