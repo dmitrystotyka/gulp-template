@@ -54,6 +54,8 @@ const htmlStream = ({ all = false } = {}) => {
         criticalCss,
         lang: config.site.lang,
         siteUrl: config.site.url,
+        // Site root path ("/" or "/sub/") — 404.html sets <base> to it, see pages/404.html
+        basePath: new URL(config.site.url).pathname.replace(/\/?$/, '/'),
       },
     }).on('error', handleError('HTML'))
   );

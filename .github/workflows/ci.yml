@@ -57,3 +57,9 @@ jobs:
         run: pnpm build && node scripts/check-dist.mjs --mode=handoff && pnpm validate
         env:
           BUILD_TARGET: handoff
+
+      # pnpm theme = handoff build + checks + wp-theme/ + check-theme + zip; PHP ships with ubuntu-latest
+      - name: WordPress theme + PHP syntax
+        run: |
+          pnpm theme
+          find wp-theme -name '*.php' -print0 | xargs -0 -n1 php -l

@@ -8,7 +8,7 @@
     <a href="https://github.com/dmitrystotyka/gulp-template/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="License"></a>
   </p>
 
-  <p><a href="https://gulp-template-seven.vercel.app/demo">Live Demo</a></p>
+  <p><a href="https://gulp-template-seven.vercel.app/">Live Demo</a></p>
 </div>
 
 <br />
@@ -46,7 +46,9 @@ pnpm dev
 pnpm dev       # dev server with hot reload
 pnpm build     # production build (minified + optimized) → dist/
 pnpm preview   # build + preview server
-pnpm zip       # WordPress handoff: readable code, optimized images → .zip
+pnpm zip       # static HTML handoff: readable code, optimized images → .zip
+pnpm theme     # WordPress: ready classic theme in wp-theme/ + installable .zip
+pnpm page about "About us"   # new page from the home page
 pnpm check     # ESLint + Stylelint + Prettier (0 warnings)
 pnpm fix       # autofix everything above
 pnpm validate  # HTML validator over dist/*.html (also runs in zip, CI, Vercel)
@@ -54,7 +56,7 @@ pnpm validate  # HTML validator over dist/*.html (also runs in zip, CI, Vercel)
 
 Optional: `pnpm tailwind:setup` adds Tailwind CSS v4.
 
-`index.html` is a clean start page. The showcase lives in `src/html/pages/demo.html` — delete that one file when you no longer need it.
+`index.html` has a "Starter components" section — button, icon, picture, a modal — ready to copy. Delete it when you start.
 
 Git hooks: pre-commit (lint-staged) · commit-msg (commitlint) · pre-push (`pnpm check`).
 
@@ -64,7 +66,7 @@ Git hooks: pre-commit (lint-staged) · commit-msg (commitlint) · pre-push (`pnp
 src/
 ├── html/
 │   ├── layouts/          # _head (meta, canonical, OG), _header, _footer, _modals, _scripts
-│   ├── pages/            # index (clean start), template, 404, demo (deletable) → dist/*.html
+│   ├── pages/            # index (starter components — copy it for a new page), 404 → dist/*.html
 │   └── components/       # _button, _icon, _picture, modals/ (_frame-start/_frame-end + one file per modal)
 ├── styles/
 │   ├── vars.scss         # Design tokens, Tailwind naming: --color-red-300, --text-lg
@@ -144,7 +146,7 @@ A modal is one file in `src/html/components/modals/` — id, title and content t
 @@include('components/modals/_frame-end.html')
 ```
 
-Include it in `layouts/_modals.html` (every page) or in one page. Copy `components/modals/_demo.html` to start.
+Include it in `layouts/_modals.html` (every page) or in one page. Copy `components/modals/_example.html` to start.
 
 > HTML sources (`src/html/`) are excluded from Prettier — it would glue `@@include` lines together. `dist/` is still formatted by the build.
 
@@ -203,9 +205,28 @@ CSS-first config in `src/styles/tailwind.css` (`@theme`, `@source`):
 
 ## WordPress Handoff
 
-`pnpm zip` (handoff build + smoke test + HTML validation + archive) makes `dist/` self-sufficient inside a theme:
+**`pnpm theme`** turns the site into a ready classic WordPress theme — `wp-theme/` plus `<project>-wp-theme-<date>.zip`
+(upload via **Appearance → Themes → Add New → Upload Theme**):
+
+```
+wp-theme/
+├── style.css · functions.php · screenshot.png
+├── header.php · footer.php      # everything before / after <main>, with wp_head(), wp_footer(), body_class()
+├── front-page.php · 404.php     # <main> of index.html / 404.html
+├── page-<name>.php              # one per page (WordPress page with that slug)
+├── index.php                    # fallback: posts, archives, other pages
+├── inc/assets.php               # CSS/JS in build order — functions.php enqueues them (defer, filemtime versions)
+├── inc/sprite.svg               # inline icon sprite; <?php <prefix>_icon( 'arrow-right' ); ?> in PHP
+└── styles/ scripts/ assets/
+```
+
+The HTML stays the source: run `pnpm theme` again after changes. Once a WP developer edits the PHP, the theme is theirs.
+`scripts/check-theme.mjs` verifies the theme (every enqueued file exists, no `./` or `.html` links, no leftovers); CI also runs `php -l`.
+
+**`pnpm zip`** archives the readable `dist/` (static HTML) for a client or a hand-made theme:
 
 - HTML is Prettier-formatted, CSS keeps source order, JS ships as readable per-file classic scripts
+- `404.html` doesn't clash with WordPress: WP only uses `404.php` (classic themes) or `templates/404.html` (block themes) — a `404.html` in the theme root is never loaded. Turn its markup into `404.php`.
 - **Tailwind theme kit** (Tailwind active): `dist/tailwind.css` + `package.json` + `TAILWIND.md`. The theme scans its own `**/*.{php,html,js}` (without `vendor/`, `node_modules/`, `scripts/vendor/`) — `npm install`, then `npm run dev` (watch, rebuilds in milliseconds) or `npm run build` (minified). No Node: the standalone Tailwind CLI runs the same. Versions pinned to the project's Tailwind; `TAILWIND.md` lists the PHP rules (full class names, `@source inline` for classes stored in the database)
 
 ## Deploy

@@ -16,8 +16,25 @@
         <section class="hero">
           <div class="container">
             <h1>Home</h1>
-            <!-- Template showcase — remove this link together with pages/demo.html -->
-            <p><a href="./demo.html">See the template demo →</a></p>
+          </div>
+        </section>
+
+        <!-- Starter components: copy what you need, then delete this section -->
+        <section>
+          <div class="container">
+            <h2>Button</h2>
+            <p>
+              @@include('components/_button.html', {"text": "Button"})
+              @@include('components/_button.html', {"text": "Link", "href": "./404.html", "variant": "outline", "icon": "arrow-right"})
+              @@include('components/_button.html', {"text": "Open modal", "popup": "example"})
+            </p>
+
+            <h2>Icon</h2>
+            <p>@@include('components/_icon.html', {"name": "arrow-right"})</p>
+
+            <h2>Picture</h2>
+            @@include('components/_picture.html', {"src": "./assets/img/previews/global", "ext": "webp", "alt": "Preview",
+              "class": "", "loading": "lazy", "width": "1200", "height": "600"})
           </div>
         </section>
       </main>
@@ -27,6 +44,7 @@
 
     <!-- Popups -->
     @@include('layouts/_modals.html')
+    @@include('components/modals/_example.html')
 
     <!-- Scripts: enable components in layouts/_scripts.html -->
     @@include('layouts/_scripts.html')

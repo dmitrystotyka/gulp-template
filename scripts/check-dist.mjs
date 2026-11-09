@@ -75,6 +75,14 @@ for (const page of html) {
   assert(!/\s(?:src|href)="\/(?!\/)/.test(content), `${page}: no root-absolute src/href (file://)`);
 }
 
+// 404 is served for nested missing URLs: <base> must precede every stylesheet
+if (html.includes('404.html')) {
+  const page = read('404.html');
+  // `.href = '/'` — the variable name may be minified, the assignment stays
+  const base = page.search(/\.href\s*=\s*['"]\//);
+  assert(base !== -1 && base < page.indexOf('<link rel="stylesheet"'), '404.html: <base> script before stylesheets');
+}
+
 for (const file of js) {
   assert(!/^\s*(?:import|export)\s/m.test(read(file)), `${file}: classic script, no import/export (file://)`);
 }

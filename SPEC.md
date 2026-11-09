@@ -19,17 +19,18 @@ Each has an ID; the right column is what fails when it breaks.
 
 ### Output (`dist/`)
 
-| ID  | Requirement                                                                                            | Enforced by          |
-| --- | ------------------------------------------------------------------------------------------------------ | -------------------- |
-| O1  | Opens from disk (file://): no `type="module"`, no root-absolute `/` paths, links `./page.html`         | `check-dist`         |
-| O2  | Icons work from disk: sprite inlined after `<body>`, `<use href="#id">` only                           | `check-dist`         |
-| O3  | Scripts are classic, copied 1:1 per file, share `window.App`; no `import`/`export`                     | `check-dist`, ESLint |
-| O4  | Every page: `<html lang>`, absolute canonical + `og:url` + `og:image` from `SITE_URL`                  | `check-dist`         |
-| O5  | No leftovers: `@@…`, `__PAGE_URL__`, `/* __…__ */` placeholders                                        | `check-dist`         |
-| O6  | Valid HTML (`html-validate:recommended` + `prettier` presets)                                          | `pnpm validate`      |
-| O7  | Every jpg/png has a `.webp` sibling; AVIF opt-in                                                       | `check-dist`         |
-| O8  | No sourcemaps in build/zip; no Tailwind kit in a vanilla build                                         | `check-dist`         |
-| O9  | Output works offline: vendors copied from `node_modules`, no CDN at runtime, no Tailwind browser build | `check-dist`, review |
+| ID  | Requirement                                                                                                     | Enforced by          |
+| --- | --------------------------------------------------------------------------------------------------------------- | -------------------- |
+| O1  | Opens from disk (file://): no `type="module"`, no root-absolute `/` paths, links `./page.html`                  | `check-dist`         |
+| O2  | Icons work from disk: sprite inlined after `<body>`, `<use href="#id">` only                                    | `check-dist`         |
+| O3  | Scripts are classic, copied 1:1 per file, share `window.App`; no `import`/`export`                              | `check-dist`, ESLint |
+| O4  | Every page: `<html lang>`, absolute canonical + `og:url` + `og:image` from `SITE_URL`                           | `check-dist`         |
+| O5  | No leftovers: `@@…`, `__PAGE_URL__`, `/* __…__ */` placeholders                                                 | `check-dist`         |
+| O6  | Valid HTML (`html-validate:recommended` + `prettier` presets)                                                   | `pnpm validate`      |
+| O7  | Every jpg/png has a `.webp` sibling; AVIF opt-in                                                                | `check-dist`         |
+| O8  | No sourcemaps in build/zip; no Tailwind kit in a vanilla build                                                  | `check-dist`         |
+| O9  | Output works offline: vendors copied from `node_modules`, no CDN at runtime, no Tailwind browser build          | `check-dist`, review |
+| O10 | `404.html` styled on any missing URL, also nested: `<base href=basePath>` first in `<head>`, skipped on file:// | `check-dist`, review |
 
 ### Tailwind (when `src/styles/tailwind.css` exists)
 
@@ -70,14 +71,25 @@ Each has an ID; the right column is what fails when it breaks.
 | S4  | Components document params in `<!--- --->`; optional params behind `@@if (context.x)` | review, `check-dist` O5 |
 | S5  | `<img>`/`<video>`/`<iframe>` carry `width`+`height`; LCP image eager, rest lazy       | `pnpm validate`, review |
 
+### WordPress theme (`pnpm theme` → `wp-theme/`)
+
+| ID  | Requirement                                                                                                                                                                                                      | Enforced by                             |
+| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
+| W1  | Classic theme installable from the zip: files inside `<slug>/`, `style.css` (Theme Name, Requires at least 6.3), `index.php`, `functions.php`                                                                    | `check-theme`                           |
+| W2  | Pages split at `<main>`: shared `header.php`/`footer.php` (wp_head, body_class, wp_body_open, wp_footer); `front-page.php`, `404.php`, `page-<name>.php`; page-only markup after `</main>` stays in its template | `theme/build.js` (fails), `check-theme` |
+| W3  | One asset list: `inc/assets.php` from the build's own `<link>`/`<script>` order (commented-out ones skipped); enqueued in order, scripts `defer` in footer; every file exists                                    | `check-theme`                           |
+| W4  | No static leftovers in PHP: no `./` URLs, `.html` links, hardcoded `<script src>`, `@@`, placeholders; SEO meta/`<title>` left to WordPress                                                                      | `check-theme`                           |
+| W5  | Valid PHP in every template                                                                                                                                                                                      | CI `php -l`                             |
+| W6  | HTML is the source: `wp-theme/` is regenerated from scratch each run, never edited in the repo (gitignored)                                                                                                      | `.gitignore`, review                    |
+
 ### Repo & supply chain
 
-| ID  | Requirement                                                                              | Enforced by               |
-| --- | ---------------------------------------------------------------------------------------- | ------------------------- |
-| R1  | `pnpm check` 0 warnings on pre-push, CI, Vercel                                          | husky, CI, `vercel.json`  |
-| R2  | Conventional commits, every commit bumps `package.json` semver                           | commitlint, review        |
-| R3  | Template stays vanilla: no tailwindcss/swiper in deps, `vendors: []`                     | review                    |
-| R4  | `minimumReleaseAge` 3 days, empty audited `onlyBuiltDependencies`, SHA-pinned CI actions | `pnpm-workspace.yaml`, CI |
+| ID  | Requirement                                                                                             | Enforced by               |
+| --- | ------------------------------------------------------------------------------------------------------- | ------------------------- |
+| R1  | `pnpm check` 0 warnings on pre-push, CI, Vercel                                                         | husky, CI, `vercel.json`  |
+| R2  | Conventional commits, every commit bumps `package.json` semver                                          | commitlint, review        |
+| R3  | Template repo stays vanilla (projects made from it don't): no tailwindcss/swiper in deps, `vendors: []` | review                    |
+| R4  | `minimumReleaseAge` 3 days, empty audited `onlyBuiltDependencies`, SHA-pinned CI actions                | `pnpm-workspace.yaml`, CI |
 
 ## Non-goals
 
@@ -88,6 +100,7 @@ SPA/routing, JS bundling or TS, CMS logic, server-side code, image CDNs, runtime
 ```bash
 pnpm check && pnpm build && node scripts/check-dist.mjs --mode=prod && pnpm validate
 pnpm exec cross-env BUILD_TARGET=handoff pnpm build && node scripts/check-dist.mjs --mode=handoff && pnpm validate   # pipeline changes
+pnpm theme   # page structure / theme changes: builds, checks, generates and zips the WordPress theme
 ```
 
-New requirement → add a row here and, where possible, a check in `scripts/check-dist.mjs`.
+New requirement → add a row here and, where possible, a check in `scripts/check-dist.mjs` / `scripts/check-theme.mjs`.

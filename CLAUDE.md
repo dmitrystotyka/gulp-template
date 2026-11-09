@@ -9,17 +9,19 @@ No JS bundler. Node 24 · pnpm 10.16+.
 pnpm dev       # dev server + watch
 pnpm build     # production build (minified) → dist/
 pnpm preview   # build + serve dist/
-pnpm zip       # handoff build (readable code, optimized images) → .zip
+pnpm zip       # handoff build (readable code, optimized images) → static HTML .zip
+pnpm theme     # handoff build → wp-theme/ (classic WordPress theme) + check-theme → theme .zip
+pnpm page about ["About us"]   # new page from index.html (without Starter components)
 pnpm check     # ESLint + Stylelint + Prettier, 0 warnings (pre-push, CI, Vercel)
 pnpm fix       # autofix all of the above
 pnpm validate  # HTML validator (html-validate) over dist/*.html
 ```
 
-Setup: `pnpm tailwind:setup`. Demo = `src/html/pages/demo.html` (delete the file to drop it).
+Setup: `pnpm tailwind:setup`. `index.html` shows every component in one "Starter components" section — delete it when you start.
 
 ## How to work here
 
-1. **`SPEC.md`** — what must stay true (requirements O/M/B/S/R + what enforces each). Never break one.
+1. **`SPEC.md`** — what must stay true (requirements O/M/B/T/S/W/R + what enforces each). Never break one.
 2. **Read the folder's `CLAUDE.md`** (map below) and write code the way it says.
 3. **Library/tool code → Context7 first** (section below), then the official docs, never memory alone.
 4. **Change behaviour → update the doc in the same change** (and `SPEC.md` if a requirement changes).
@@ -72,8 +74,8 @@ dotenv) resolve the ID first; add it to the table once found.
 - **Same in every mode** → `project.config.js`: `lang`, `criticalCSS`, `images`, `sprites`, `vendors`, `tailwind`, `postcssPlugins`, `sizeReport`.
 - Secrets/local overrides → `.env.local` (gitignored, wins). New switch = `.env.*` + `flag()` in `gulp/configs/env.js`.
 
-Other: `SPEC.md` (requirements) · `scripts/check-dist.mjs` (dist smoke test) ·
-`.htmlvalidate.json` (validator rules) · `.template/setup/` (tailwind, zip — pure Node, no tar) · `.github/`, `vercel.json` (CI, deploy).
+Other: `SPEC.md` (requirements) · `scripts/check-dist.mjs` (dist smoke test) · `scripts/check-theme.mjs` (wp-theme smoke test) ·
+`.htmlvalidate.json` (validator rules) · `.template/setup/` (tailwind, zip, page, theme/ — pure Node, no tar) · `.github/`, `vercel.json` (CI, deploy).
 
 ## Rules
 
@@ -83,7 +85,8 @@ Other: `SPEC.md` (requirements) · `scripts/check-dist.mjs` (dist smoke test) ·
 - No bundler/transpiler, no second minify path.
 - `process.env` only in `gulp/configs/env.js` (exception: `gulp/utils/prepare.js` install hook reads `CI`/`VERCEL`); no hardcoded ports/URLs.
 - npm scripts must run in cmd too: no `|| true`, `rm -rf`, `VAR=x cmd` — use `cross-env` or a Node script.
-- Template stays vanilla: no tailwindcss/swiper in deps, `vendors: []` commented out.
+- **This repo** (the template itself) stays vanilla: no tailwindcss/swiper in deps, `vendors: []` commented out.
+  A project made from it adds whatever it needs (`pnpm tailwind:setup`, `pnpm add swiper`) — the rule no longer applies there.
 - Supply chain: `minimumReleaseAge` 3 days, audited `onlyBuiltDependencies`, SHA-pinned CI actions.
 
 ## PageSpeed (Core Web Vitals)
@@ -104,11 +107,6 @@ Other: `SPEC.md` (requirements) · `scripts/check-dist.mjs` (dist smoke test) ·
 - **Never commit or push on your own.** Ask first, or do it when the user says so.
 - **Version**: every commit bumps `package.json` semver (fix → patch, feat → minor, breaking → major)
   and ends the message with it: `feat: short summary (v3.4.0)`. Conventional commits (commitlint).
-- **Backup before push**: one branch `backup`, on GitHub only (no local copy), holding the previous version.
-  Before pushing main, move it to the current remote main:
-  ```bash
-  git fetch origin
-  git push --force origin origin/main:refs/heads/backup
-  git push origin main
-  ```
-- No other branches. Never force-push `main` (`--force` is for `backup` only).
+- **One branch: `main`** — locally and on GitHub. No backup/feature branches; every version is a commit
+  (`git log`, tags). Push: `git fetch origin` → check it's a fast-forward → `git push origin main`.
+- Never force-push `main`.

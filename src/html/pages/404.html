@@ -1,6 +1,18 @@
 <!doctype html>
 <html lang="@@lang">
   <head>
+    <!---
+      The host serves this page for ANY missing URL (/blog/post/x), so relative
+      ./styles/… would resolve to /blog/post/styles/…. A <base> at the site root
+      fixes that; it must come before every link. Skipped on file:// (opened from disk).
+    --->
+    <script>
+      if (location.protocol !== 'file:') {
+        var base = document.createElement('base');
+        base.href = '@@basePath';
+        document.head.appendChild(base);
+      }
+    </script>
     @@include('layouts/_head.html', {
       "title": "404 — Page Not Found",
       "description": "The page you are looking for does not exist",
@@ -14,7 +26,12 @@
     <div class="wrapper">
       @@include('layouts/_header.html')
 
-      <main class="page">404 — Page Not Found</main>
+      <main class="page">
+        <div class="container">
+          <h1>404 — Page Not Found</h1>
+          <p>@@include('components/_button.html', {"text": "Home", "href": "./index.html"})</p>
+        </div>
+      </main>
 
       @@include('layouts/_footer.html')
     </div>

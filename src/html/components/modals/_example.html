@@ -1,0 +1,10 @@
+<!--- Example modal — copy this file to make a new one (components/modals/_<name>.html), then set id/title. --->
+@@include('components/modals/_frame-start.html', {"id": "example", "title": "Example modal"})
+
+      <p>Everything about a modal lives in one file: id, title and any markup.</p>
+
+      <p>
+        @@include('components/_button.html', {"text": "Close", "variant": "outline", "close": "true"})
+      </p>
+
+@@include('components/modals/_frame-end.html')

@@ -44,6 +44,6 @@ export default [
     },
   },
   {
-    ignores: ['dist/**', 'node_modules/**', '*.min.js'],
+    ignores: ['dist/**', 'wp-theme/**', 'node_modules/**', '*.min.js'],
   },
 ];

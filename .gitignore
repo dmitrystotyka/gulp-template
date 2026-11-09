@@ -4,6 +4,7 @@ node_modules/
 
 # Build output
 dist/
+wp-theme/
 
 # Environment — .env.development/.env.production are committed (no secrets);
 # real values go to .env.local

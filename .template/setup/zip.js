@@ -1,8 +1,10 @@
 /**
- * Handoff Archive Script
- * Run: pnpm zip (runs the handoff build + check-dist + validate first)
+ * Archive Script
+ *   pnpm zip    → dist/      → <project>-<YYYY-MM-DD>.zip           (static HTML handoff)
+ *   pnpm theme  → wp-theme/  → <project>-wp-theme-<YYYY-MM-DD>.zip  (files inside <slug>/,
+ *                 so WordPress "Upload Theme" creates the theme folder)
+ * Options: --dir=<folder> --suffix=<name part> --root (wrap files in the theme slug folder)
  *
- * Archives dist/ into <project-name>-<YYYY-MM-DD>.zip at the project root.
  * Pure Node (zlib) — no tar/zip binary, so it behaves the same in PowerShell,
  * Git Bash, macOS and Linux (GNU tar cannot write zip archives).
  */
@@ -11,14 +13,20 @@ import { deflateRawSync, crc32 } from 'node:zlib';
 import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
 import { resolvePath } from '../paths.js';
+import { themeSlug } from './theme/slug.js';
 
-const dist = resolvePath('dist');
+const arg = (name) => process.argv.find((a) => a.startsWith(`--${name}=`))?.split('=')[1];
+const dirName = arg('dir') ?? 'dist';
+const dist = resolvePath(dirName);
 const SKIP = new Set(['.DS_Store', 'Thumbs.db']);
 
 if (!existsSync(dist)) {
-  console.error('\n  ✗ dist/ not found — run pnpm zip\n');
+  console.error(`\n  ✗ ${dirName}/ not found — run pnpm ${dirName === 'dist' ? 'zip' : 'theme'}\n`);
   process.exit(1);
 }
+
+const pkgName = JSON.parse(readFileSync(resolvePath('package.json'), 'utf8')).name;
+const rootPrefix = process.argv.includes('--root') ? `${themeSlug(pkgName)}/` : '';
 
 const walk = (dir) =>
   readdirSync(dir, { withFileTypes: true }).flatMap((e) =>
@@ -36,7 +44,7 @@ const centrals = [];
 let offset = 0;
 
 for (const file of walk(dist)) {
-  const name = Buffer.from(relative(dist, file).split(sep).join('/'));
+  const name = Buffer.from(rootPrefix + relative(dist, file).split(sep).join('/'));
   const data = readFileSync(file);
   const deflated = deflateRawSync(data, { level: 9 });
   const stored = deflated.length >= data.length; // already-compressed files (webp, woff2…)
@@ -83,8 +91,8 @@ end.writeUInt16LE(centrals.length / 2, 10);
 end.writeUInt32LE(centralDir.length, 12);
 end.writeUInt32LE(offset, 16);
 
-const pkg = JSON.parse(readFileSync(resolvePath('package.json'), 'utf8'));
-const archiveName = `${pkg.name}-${new Date().toISOString().slice(0, 10)}.zip`;
+const suffix = arg('suffix') ? `-${arg('suffix')}` : '';
+const archiveName = `${themeSlug(pkgName)}${suffix}-${new Date().toISOString().slice(0, 10)}.zip`;
 const archive = Buffer.concat([...locals, centralDir, end]);
 
 writeFileSync(resolvePath(archiveName), archive);

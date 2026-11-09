@@ -158,8 +158,10 @@ summary {
   display: none;
 }
 
-/* Note: removing list-style also drops list semantics in VoiceOver/Safari —
-   add role="list" to semantic lists that must stay announced as lists */
+/* Note: without list-style VoiceOver/Safari may stop announcing a list.
+   Don't add role="list" — html-validate (no-redundant-role) fails the build.
+   A content list that must be announced: give it a marker back,
+   e.g. .prose ul { list-style: disc; } */
 ul,
 ol {
   list-style: none;

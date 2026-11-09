@@ -50,7 +50,7 @@ same commands: https://github.com/tailwindlabs/tailwindcss/releases —
   those names belong to the theme CSS — Tailwind's own \`container\` would break the layout.
   A new class in theme CSS that shares a Tailwind name → add it to that line.
 - \`npm run dev\` keeps classes you removed until restart; \`npm run build\` is always exact.
-- Enqueue with a cache-busting version:
+- Theme from \`pnpm theme\`: already enqueued (inc/assets.php). Your own theme — enqueue with a cache-busting version:
   \`wp_enqueue_style('tailwind', get_theme_file_uri('styles/tailwind.css'), [], filemtime(get_theme_file_path('styles/tailwind.css')));\`
 `;
 
