@@ -81,7 +81,8 @@ Other: `SPEC.md` (requirements) · `scripts/check-dist.mjs` (dist smoke test) ·
   So: classic `<script defer>` (no `type="module"`), inline sprite, relative `./` paths, links to `page.html`.
   `check-dist` enforces it.
 - No bundler/transpiler, no second minify path.
-- `process.env` only in `gulp/configs/env.js`; no hardcoded ports/URLs.
+- `process.env` only in `gulp/configs/env.js` (exception: `gulp/utils/prepare.js` install hook reads `CI`/`VERCEL`); no hardcoded ports/URLs.
+- npm scripts must run in cmd too: no `|| true`, `rm -rf`, `VAR=x cmd` — use `cross-env` or a Node script.
 - Template stays vanilla: no tailwindcss/swiper in deps, `vendors: []` commented out.
 - Supply chain: `minimumReleaseAge` 3 days, audited `onlyBuiltDependencies`, SHA-pinned CI actions.
 

@@ -33,12 +33,12 @@
 ```bash
 npx degit dmitrystotyka/gulp-template my-project
 cd my-project
-pnpm install
-git init && pnpm prepare   # enable git hooks
+git init
+pnpm install   # names the project after its folder (v1.0.0) + enables git hooks
 pnpm dev
 ```
 
-> Node.js 24+, pnpm 10.16+
+> Node.js 24+, pnpm 10.16+. Any order works — `pnpm install` first, `git init` later? Run `pnpm prepare` once after `git init` to enable the hooks. Same in cmd, PowerShell, Git Bash, macOS, Linux.
 
 ## Commands
 

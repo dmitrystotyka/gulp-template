@@ -15,7 +15,9 @@ utils/transforms.js  prettier/terser/lightningcss/sharp/svgo streams, pageMeta, 
 utils/stream.js      sizeReporter, handleError(title), streamToPromise
 utils/cssLayers.js   PostCSS plugin: SCSS entries → cascade layers (Tailwind active only)
 utils/logger.js      logBuildEnd → exit 1 when app.build.errors > 0
-utils/prepare.js     degit clones only: resets package.json, self-deletes
+utils/prepare.js     `prepare` (every install), pure Node — no `||`/`true` (cmd has neither), never fails:
+                     fresh copy (name gulp-template, no commits, not CI) → own name + v1.0.0, no LICENSE;
+                     then husky hooks when node_modules + .git exist, else a one-line hint
 ```
 
 ## Build modes
