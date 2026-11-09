@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "pnpm check && pnpm build && node scripts/check-dist.mjs --mode=prod && pnpm validate",
+  "buildCommand": "pnpm check && pnpm build && node .template/checks/check-dist.mjs --mode=prod && pnpm validate",
   "outputDirectory": "dist",
   "cleanUrls": true,
   "trailingSlash": false,

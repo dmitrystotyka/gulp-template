@@ -36,11 +36,29 @@ for (const required of [
   'footer.php',
   'front-page.php',
   '404.php',
+  'page.php',
+  'single.php',
   'inc/assets.php',
 ]) {
   assert(files.includes(required), `${required} present`);
 }
-assert(/Theme Name:\s*\S/.test(read('style.css')), 'style.css: Theme Name header');
+
+// Header fields Theme Check / the wordpress.org directory require
+const styleHeader = read('style.css').match(/\/\*([\s\S]*?)\*\//)?.[1] ?? '';
+for (const field of [
+  'Theme Name',
+  'Author',
+  'Description',
+  'Version',
+  'Requires at least',
+  'Tested up to',
+  'Requires PHP',
+  'License',
+  'License URI',
+  'Text Domain',
+]) {
+  assert(new RegExp(`^\\s*${field}:[ \\t]*\\S`, 'm').test(styleHeader), `style.css header: ${field}`);
+}
 assert(!files.some((f) => f.endsWith('.html')), 'no .html pages left in the theme');
 
 // ---------- assets ------------------------------------------------------------

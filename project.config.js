@@ -45,4 +45,17 @@ export const projectConfig = {
 
   // Gzip size report in the build log
   sizeReport: true,
+
+  // WordPress theme header (`pnpm theme` → wp-theme/style.css). Name, version and description
+  // come from package.json. Theme Check / wordpress.org need every field below.
+  theme: {
+    author: 'Dmitry Stotyka',
+    authorUri: 'https://dmitrystotyka.com',
+    themeUri: '', // optional: the site or repo
+    license: 'GNU General Public License v2 or later', // WordPress themes must be GPL-compatible
+    licenseUri: 'https://www.gnu.org/licenses/gpl-2.0.html',
+    requiresWp: '6.3', // scripts use the `defer` strategy (WordPress 6.3+)
+    testedUpTo: '7.1', // latest WordPress you checked the theme on
+    requiresPhp: '7.4',
+  },
 };

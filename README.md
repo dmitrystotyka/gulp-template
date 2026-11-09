@@ -82,7 +82,7 @@ src/
 │   └── utils/            # DOM, debounce, bodyLock
 └── assets/
     ├── fonts/  img/  sprites/  video/
-scripts/check-dist.mjs    # dist smoke test (CI, pnpm zip)
+.template/checks/check-dist.mjs    # dist smoke test (CI, pnpm zip)
 ```
 
 Sizes are always written in px through `rem()` / `em()` (`rem(18)`, `rem(12 24)`), colors and text sizes through tokens with Tailwind v4 names and values (`var(--color-gray-950)`), opacity through `alpha(gray-950, 60)` — the SCSS twin of `bg-gray-950/60`. Stylelint rejects raw `px`/`rem`/`em`, hex and `rgb()` outside `vars.scss`.
@@ -210,24 +210,26 @@ CSS-first config in `src/styles/tailwind.css` (`@theme`, `@source`):
 
 ```
 wp-theme/
-├── style.css · functions.php · screenshot.png
+├── style.css                    # full theme header: author, license, Tested up to… (project.config.js → theme)
+├── functions.php · screenshot.png
 ├── header.php · footer.php      # everything before / after <main>, with wp_head(), wp_footer(), body_class()
 ├── front-page.php · 404.php     # <main> of index.html / 404.html
 ├── page-<name>.php              # one per page (WordPress page with that slug)
-├── index.php                    # fallback: posts, archives, other pages
+├── page.php · single.php        # any other page / a single post: title + editor content
+├── index.php                    # fallback: blog list, archives, search (with pagination)
 ├── inc/assets.php               # CSS/JS in build order — functions.php enqueues them (defer, filemtime versions)
 ├── inc/sprite.svg               # inline icon sprite; <?php <prefix>_icon( 'arrow-right' ); ?> in PHP
 └── styles/ scripts/ assets/
 ```
 
 The HTML stays the source: run `pnpm theme` again after changes. Once a WP developer edits the PHP, the theme is theirs.
-`scripts/check-theme.mjs` verifies the theme (every enqueued file exists, no `./` or `.html` links, no leftovers); CI also runs `php -l`.
+`.template/checks/check-theme.mjs` verifies the theme (every enqueued file exists, no `./` or `.html` links, no leftovers); CI also runs `php -l`.
 
 **`pnpm zip`** archives the readable `dist/` (static HTML) for a client or a hand-made theme:
 
 - HTML is Prettier-formatted, CSS keeps source order, JS ships as readable per-file classic scripts
 - `404.html` doesn't clash with WordPress: WP only uses `404.php` (classic themes) or `templates/404.html` (block themes) — a `404.html` in the theme root is never loaded. Turn its markup into `404.php`.
-- **Tailwind theme kit** (Tailwind active): `dist/tailwind.css` + `package.json` + `TAILWIND.md`. The theme scans its own `**/*.{php,html,js}` (without `vendor/`, `node_modules/`, `scripts/vendor/`) — `npm install`, then `npm run dev` (watch, rebuilds in milliseconds) or `npm run build` (minified). No Node: the standalone Tailwind CLI runs the same. Versions pinned to the project's Tailwind; `TAILWIND.md` lists the PHP rules (full class names, `@source inline` for classes stored in the database)
+- **Tailwind theme kit** (Tailwind active): `dist/tailwind.css` + `package.json` + `TAILWIND.md`. The theme scans its own `**/*.{php,html,js}` (without `vendor/`, `node_modules/`, `scripts/vendor/`) — `npm install`, then `npm run dev` (watch, rebuilds in milliseconds) or `npm run build` (minified). No Node: the standalone Tailwind CLI runs the same. Tailwind pinned to the exact version the site was built with (commit the theme's package-lock.json); `TAILWIND.md` lists the PHP rules (full class names, `@source inline` for classes stored in the database)
 
 ## Deploy
 

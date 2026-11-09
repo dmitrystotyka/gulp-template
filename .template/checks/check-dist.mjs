@@ -4,9 +4,9 @@
  * Fails (exit 1) on the first broken expectation.
  *
  * Usage:
- *   node scripts/check-dist.mjs --mode=prod      # minified output
- *   node scripts/check-dist.mjs --mode=handoff   # readable output (WordPress deliverable)
- *   node scripts/check-dist.mjs --mode=dev
+ *   node .template/checks/check-dist.mjs --mode=prod      # minified output
+ *   node .template/checks/check-dist.mjs --mode=handoff   # readable output (WordPress deliverable)
+ *   node .template/checks/check-dist.mjs --mode=dev
  */
 
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';

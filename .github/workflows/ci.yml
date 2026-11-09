@@ -51,10 +51,10 @@ jobs:
         run: pnpm audit --audit-level=high || true
 
       - name: Production build + smoke test + HTML validation
-        run: pnpm build && node scripts/check-dist.mjs --mode=prod && pnpm validate
+        run: pnpm build && node .template/checks/check-dist.mjs --mode=prod && pnpm validate
 
       - name: Handoff build + smoke test + HTML validation
-        run: pnpm build && node scripts/check-dist.mjs --mode=handoff && pnpm validate
+        run: pnpm build && node .template/checks/check-dist.mjs --mode=handoff && pnpm validate
         env:
           BUILD_TARGET: handoff
 

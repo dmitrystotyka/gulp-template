@@ -34,6 +34,10 @@ npm run dev     # watch: rebuilds on every save (milliseconds)
 npm run build   # minified, before going live — commit styles/tailwind.css
 \`\`\`
 
+- The shipped \`styles/tailwind.css\` is readable; \`npm run build\` rewrites it minified (\`npm run dev\` keeps it readable).
+- Tailwind is pinned to the exact version the site was built with. \`npm install\` creates
+  \`package-lock.json\` — commit it, so every developer gets the same build.
+
 No Node on the server/machine? The standalone CLI (one executable, no npm) runs the
 same commands: https://github.com/tailwindlabs/tailwindcss/releases —
 \`./tailwindcss -i ./tailwind.css -o ./styles/tailwind.css --watch\` / \`--minify\`.
@@ -54,10 +58,12 @@ same commands: https://github.com/tailwindlabs/tailwindcss/releases —
   \`wp_enqueue_style('tailwind', get_theme_file_uri('styles/tailwind.css'), [], filemtime(get_theme_file_path('styles/tailwind.css')));\`
 `;
 
+// Exact version (no ^): the theme rebuilds with the very Tailwind that produced the shipped CSS.
+// Tailwind pins its own internal packages exactly, so this fixes the whole toolchain;
+// the developer's `npm install` writes the lock file for everything else.
 const installedTailwindRange = () => {
   try {
-    const { version } = createRequire(import.meta.url)('tailwindcss/package.json');
-    return `^${version}`;
+    return createRequire(import.meta.url)('tailwindcss/package.json').version;
   } catch {
     return '^4';
   }
@@ -97,8 +103,13 @@ export const tailwindKit = async () => {
     return;
   }
 
+  // Identity from the project's own package.json — the theme folder is "the project" for the WP developer
+  const project = JSON.parse(await fs.readFile(path.join(paths.root, 'package.json'), 'utf8'));
   const kitPackage = {
-    name: 'tailwind-theme-kit',
+    name: project.name,
+    version: project.version,
+    ...(project.description ? { description: project.description } : {}),
+    ...(project.author ? { author: project.author } : {}),
     private: true,
     scripts: {
       dev: 'tailwindcss -i ./tailwind.css -o ./styles/tailwind.css --watch',

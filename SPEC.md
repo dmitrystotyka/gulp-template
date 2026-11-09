@@ -73,14 +73,14 @@ Each has an ID; the right column is what fails when it breaks.
 
 ### WordPress theme (`pnpm theme` → `wp-theme/`)
 
-| ID  | Requirement                                                                                                                                                                                                      | Enforced by                             |
-| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
-| W1  | Classic theme installable from the zip: files inside `<slug>/`, `style.css` (Theme Name, Requires at least 6.3), `index.php`, `functions.php`                                                                    | `check-theme`                           |
-| W2  | Pages split at `<main>`: shared `header.php`/`footer.php` (wp_head, body_class, wp_body_open, wp_footer); `front-page.php`, `404.php`, `page-<name>.php`; page-only markup after `</main>` stays in its template | `theme/build.js` (fails), `check-theme` |
-| W3  | One asset list: `inc/assets.php` from the build's own `<link>`/`<script>` order (commented-out ones skipped); enqueued in order, scripts `defer` in footer; every file exists                                    | `check-theme`                           |
-| W4  | No static leftovers in PHP: no `./` URLs, `.html` links, hardcoded `<script src>`, `@@`, placeholders; SEO meta/`<title>` left to WordPress                                                                      | `check-theme`                           |
-| W5  | Valid PHP in every template                                                                                                                                                                                      | CI `php -l`                             |
-| W6  | HTML is the source: `wp-theme/` is regenerated from scratch each run, never edited in the repo (gitignored)                                                                                                      | `.gitignore`, review                    |
+| ID  | Requirement                                                                                                                                                                                                                                                                | Enforced by                             |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
+| W1  | Classic theme installable from the zip: files inside `<slug>/`, `style.css` with the full header Theme Check needs (Author, Description, Version, Requires at least/PHP, Tested up to, License + URI, Text Domain), `index.php`, `page.php`, `single.php`, `functions.php` | `check-theme`                           |
+| W2  | Pages split at `<main>`: shared `header.php`/`footer.php` (wp_head, body_class, wp_body_open, wp_footer); `front-page.php`, `404.php`, `page-<name>.php`; page-only markup after `</main>` stays in its template                                                           | `theme/build.js` (fails), `check-theme` |
+| W3  | One asset list: `inc/assets.php` from the build's own `<link>`/`<script>` order (commented-out ones skipped); enqueued in order, scripts `defer` in footer; every file exists                                                                                              | `check-theme`                           |
+| W4  | No static leftovers in PHP: no `./` URLs, `.html` links, hardcoded `<script src>`, `@@`, placeholders; SEO meta/`<title>` left to WordPress                                                                                                                                | `check-theme`                           |
+| W5  | Valid PHP in every template                                                                                                                                                                                                                                                | CI `php -l`                             |
+| W6  | HTML is the source: `wp-theme/` is regenerated from scratch each run, never edited in the repo (gitignored)                                                                                                                                                                | `.gitignore`, review                    |
 
 ### Repo & supply chain
 
@@ -98,9 +98,9 @@ SPA/routing, JS bundling or TS, CMS logic, server-side code, image CDNs, runtime
 ## Done = all green
 
 ```bash
-pnpm check && pnpm build && node scripts/check-dist.mjs --mode=prod && pnpm validate
-pnpm exec cross-env BUILD_TARGET=handoff pnpm build && node scripts/check-dist.mjs --mode=handoff && pnpm validate   # pipeline changes
+pnpm check && pnpm build && node .template/checks/check-dist.mjs --mode=prod && pnpm validate
+pnpm exec cross-env BUILD_TARGET=handoff pnpm build && node .template/checks/check-dist.mjs --mode=handoff && pnpm validate   # pipeline changes
 pnpm theme   # page structure / theme changes: builds, checks, generates and zips the WordPress theme
 ```
 
-New requirement → add a row here and, where possible, a check in `scripts/check-dist.mjs` / `scripts/check-theme.mjs`.
+New requirement → add a row here and, where possible, a check in `.template/checks/check-dist.mjs` / `.template/checks/check-theme.mjs`.

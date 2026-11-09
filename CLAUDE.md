@@ -31,13 +31,13 @@ Setup: `pnpm tailwind:setup`. `index.html` shows every component in one "Starter
 ## Verify — every HTML/pipeline change
 
 ```bash
-pnpm check && pnpm build && node scripts/check-dist.mjs --mode=prod && pnpm validate
+pnpm check && pnpm build && node .template/checks/check-dist.mjs --mode=prod && pnpm validate
 ```
 
 `pnpm validate` is mandatory, not optional: run it after any markup change and fix the
 source, never loosen `.htmlvalidate.json` to pass. `pnpm zip`, CI and Vercel run it too.
 Pipeline/env change → also the handoff pass (CI runs it):
-`pnpm exec cross-env BUILD_TARGET=handoff pnpm build && node scripts/check-dist.mjs --mode=handoff && pnpm validate`.
+`pnpm exec cross-env BUILD_TARGET=handoff pnpm build && node .template/checks/check-dist.mjs --mode=handoff && pnpm validate`.
 
 ## Library docs — Context7 (MCP)
 
@@ -71,10 +71,10 @@ dotenv) resolve the ID first; add it to the table once found.
 
 - **Differs between modes** → `.env.development` (dev) · `.env.production` (build) · `.env.handoff` (zip, overrides production):
   `SITE_URL`, `PORT`, `BROWSER`, `SOURCEMAPS`, `MINIFY`, `OPTIMIZE_IMAGES`, `SORT_MEDIA_QUERIES`, `SITEMAP`, `ROBOTS`.
-- **Same in every mode** → `project.config.js`: `lang`, `criticalCSS`, `images`, `sprites`, `vendors`, `tailwind`, `postcssPlugins`, `sizeReport`.
+- **Same in every mode** → `project.config.js`: `lang`, `criticalCSS`, `images`, `sprites`, `vendors`, `tailwind`, `postcssPlugins`, `sizeReport`, `theme` (WordPress style.css header: author, license, Tested up to).
 - Secrets/local overrides → `.env.local` (gitignored, wins). New switch = `.env.*` + `flag()` in `gulp/configs/env.js`.
 
-Other: `SPEC.md` (requirements) · `scripts/check-dist.mjs` (dist smoke test) · `scripts/check-theme.mjs` (wp-theme smoke test) ·
+Other: `SPEC.md` (requirements) · `.template/checks/check-dist.mjs` (dist smoke test) · `.template/checks/check-theme.mjs` (wp-theme smoke test) ·
 `.htmlvalidate.json` (validator rules) · `.template/setup/` (tailwind, zip, page, theme/ — pure Node, no tar) · `.github/`, `vercel.json` (CI, deploy).
 
 ## Rules

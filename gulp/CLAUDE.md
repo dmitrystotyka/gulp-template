@@ -46,7 +46,7 @@ Same task graph for build and zip — the mode lives only in `.env.*` (`BUILD_TA
   `scssOwnedRule()` (`@source not inline` of every SCSS class name). SCSS changes re-run it in watch. `utils/cssLayers.js`
   wraps the SCSS entries into layers — only when Tailwind is active, last PostCSS plugin.
   `tasks/tailwindKit.js` (prod/handoff) writes `dist/tailwind.css` (`toKitCss`: src `@source` → theme
-  `**/*.{php,html,js}`), `package.json` (`dev` watch / `build`), `TAILWIND.md`, `.gitignore`.
+  `**/*.{php,html,js}`), `package.json` (name/version/description/author from the project's own, `dev` watch / `build`), `TAILWIND.md`, `.gitignore`.
   No CDN/browser build. `tailwind:setup` never patches gulpfile/`_head.html`.
   Test a Tailwind change: back up `package.json` + `pnpm-lock.yaml`, `pnpm tailwind:setup`, run both
   verify passes, then delete `src/styles/tailwind.css` and restore the two files.

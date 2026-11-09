@@ -32,7 +32,7 @@ export default [
   },
   // Node / Gulp scripts
   {
-    files: ['gulpfile.js', 'gulp/**/*.js', 'project.config.js', '.template/**/*.js', 'scripts/**/*.{js,mjs}'],
+    files: ['gulpfile.js', 'gulp/**/*.js', 'project.config.js', '.template/**/*.{js,mjs}'],
     languageOptions: {
       globals: {
         ...globals.node,
