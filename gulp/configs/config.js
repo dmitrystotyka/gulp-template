@@ -2,38 +2,39 @@ import { existsSync } from 'node:fs';
 import { projectConfig } from '../../project.config.js';
 import { env } from './env.js';
 import { paths } from './paths.js';
-import { logWarning } from '../utils/logger.js';
 
 /**
- * Validate required config fields and resolve derived flags.
- * Fallbacks come from the resolved env (gulp/configs/env.js) — never hardcoded here.
- * Note: only shallow copies — the config may hold functions (e.g. postcss plugins).
+ * The resolved config every task reads (app.config).
+ * Merges the per-mode switches from .env (gulp/configs/env.js) with the
+ * per-project settings from project.config.js into one stable shape —
+ * tasks never read either source directly.
+ * Shallow copies only — project.config.js may hold functions (PostCSS plugins).
  */
-const validateConfig = (cfg) => {
-  const validated = { ...cfg, server: { ...cfg.server }, site: { ...cfg.site } };
+const p = projectConfig;
+const tailwind = p.tailwind ?? 'auto';
 
-  if (!validated.server.port) {
-    logWarning(`Missing config: server.port — defaulting to ${env.port}`);
-    validated.server.port = env.port;
-  }
+export const config = {
+  env: { isDev: env.isDev, isProd: env.isProd, isHandoff: env.isHandoff },
+  site: { url: env.siteUrl, lang: p.lang || 'en' },
+  server: { port: env.port, open: env.openBrowser },
+  sourceMaps: env.sourceMaps,
 
-  if (!validated.site.url) {
-    logWarning(`Missing config: site.url — defaulting to ${env.siteUrl}`);
-    validated.site.url = env.siteUrl;
-  }
+  optimization: {
+    minify: { html: env.minify, css: env.minify, js: env.minify, images: env.optimizeImages },
+    sortMediaQueries: env.sortMediaQueries,
+    criticalCSS: Boolean(p.criticalCSS),
+    sitemap: env.sitemap,
+    robots: env.robots,
+  },
 
-  if (!validated.site.lang) {
-    validated.site.lang = 'en';
-  }
+  images: p.images,
+  sprites: p.sprites,
+  vendors: p.vendors ?? [],
+  postcss: { plugins: p.postcssPlugins ?? [] },
+  sizeReport: { enabled: p.sizeReport !== false, gzip: true },
 
-  // tailwind.enabled: 'auto' → active when the entry file exists (created by `pnpm tailwind:setup`)
-  const tailwindEnabled = cfg.tailwind?.enabled ?? 'auto';
-  validated.tailwind = {
-    ...cfg.tailwind,
-    active: tailwindEnabled === 'auto' ? existsSync(`${paths.srcStyles}/tailwind.css`) : Boolean(tailwindEnabled),
-  };
-
-  return validated;
+  // 'auto' → active when the entry file exists (created by `pnpm tailwind:setup`)
+  tailwind: {
+    active: tailwind === 'auto' ? existsSync(`${paths.srcStyles}/tailwind.css`) : Boolean(tailwind),
+  },
 };
-
-export const config = validateConfig(projectConfig);

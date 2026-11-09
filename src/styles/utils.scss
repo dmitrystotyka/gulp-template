@@ -77,8 +77,8 @@
   }
 
   body {
-    color: #000;
-    background: #fff;
+    color: var(--color-black);
+    background: var(--color-white);
   }
 
   a[href^='http']::after {

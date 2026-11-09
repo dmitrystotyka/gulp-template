@@ -3,7 +3,7 @@ import prettierConfig from 'eslint-config-prettier';
 import globals from 'globals';
 
 // Prettier is NOT run as an ESLint rule: formatting is checked by
-// `pnpm format:check` (and fixed by lint-staged) — one tool per job keeps
+// `prettier --check` (`pnpm check`) (and fixed by lint-staged) — one tool per job keeps
 // `pnpm lint` fast and the error output readable.
 export default [
   js.configs.recommended,
@@ -22,10 +22,11 @@ export default [
       sourceType: 'module',
     },
   },
-  // Browser scripts
+  // Browser scripts — classic (no import/export) so dist/ works from file://
   {
     files: ['src/scripts/**/*.js'],
     languageOptions: {
+      sourceType: 'script',
       globals: globals.browser,
     },
   },

@@ -1,0 +1,533 @@
+<!doctype html>
+<!-- Demo page — showcases the template. Not needed? Delete this file, nothing else depends on it. -->
+<html lang="@@lang">
+  <head>
+    @@include('layouts/_head.html', {
+      "title": "Gulp Template — Demo",
+      "description": "A pre-configured foundation with SCSS, SVG sprites, image optimization, and automated workflows — so you can focus on building, not configuring.",
+      "image": "./assets/img/previews/global.webp"
+    })
+  </head>
+
+  <body>
+    <div class="wrapper">
+      <main class="page">
+        <style>
+          .demo {
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2.5rem 1rem;
+            background: linear-gradient(180deg, #0f172a 0%, #020617 100%);
+            position: relative;
+            overflow: hidden;
+          }
+
+          .demo::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+              radial-gradient(ellipse 80% 50% at 50% -20%, rgba(120, 119, 198, 0.15), transparent),
+              radial-gradient(ellipse 60% 40% at 100% 100%, rgba(56, 189, 248, 0.1), transparent);
+            pointer-events: none;
+          }
+
+          .demo__content {
+            position: relative;
+            text-align: center;
+            max-width: 56.25rem;
+            width: 100%;
+          }
+
+          .demo__badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #38bdf8;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-radius: 6.25rem;
+          }
+
+          .demo__badge-dot {
+            width: 0.375rem;
+            height: 0.375rem;
+            background: #22c55e;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+          }
+
+          @keyframes pulse {
+            0%,
+            100% {
+              opacity: 1;
+            }
+            50% {
+              opacity: 0.5;
+            }
+          }
+
+          .demo__title {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 800;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            color: #f8fafc;
+            margin-bottom: 1rem;
+            text-wrap: balance;
+          }
+
+          .demo__gradient {
+            background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+          }
+
+          .demo__text {
+            font-size: 1rem;
+            line-height: 1.7;
+            color: #94a3b8;
+            margin-bottom: 2rem;
+          }
+
+          .demo__actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+          }
+
+          .demo__btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 0.75rem;
+            transition: all 0.2s;
+          }
+
+          .demo__btn--primary {
+            color: #0f172a;
+            background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+            box-shadow: 0 0.25rem 1.5rem rgba(56, 189, 248, 0.3);
+          }
+
+          .demo__btn--primary:hover {
+            transform: translateY(-0.125rem);
+            box-shadow: 0 0.5rem 2rem rgba(56, 189, 248, 0.4);
+          }
+
+          .demo__btn--secondary {
+            color: #cbd5e1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+          }
+
+          .demo__btn--secondary:hover {
+            transform: translateY(-0.125rem);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+          }
+
+          .demo__install {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            max-width: 32.5rem;
+            margin: 0 auto 2rem;
+            padding: 0.75rem 1rem;
+            font-family: 'SF Mono', 'Fira Code', 'Fira Mono', Menlo, Consolas, monospace;
+            font-size: 0.875rem;
+            color: #cbd5e1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+            width: 100%;
+            box-sizing: border-box;
+          }
+
+          .demo__install:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+          }
+
+          .demo__install-dollar {
+            color: #64748b;
+            user-select: none;
+          }
+
+          .demo__install-text {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+
+          .demo__install-icon {
+            flex-shrink: 0;
+            color: #64748b;
+            transition: color 0.2s;
+          }
+
+          .demo__install:hover .demo__install-icon {
+            color: #cbd5e1;
+          }
+
+          .demo__install-icon--check {
+            color: #22c55e;
+            animation: scale-in 0.2s ease-out;
+          }
+
+          @keyframes scale-in {
+            0% {
+              transform: scale(0);
+              opacity: 0;
+            }
+            100% {
+              transform: scale(1);
+              opacity: 1;
+            }
+          }
+
+          .demo__stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+            max-width: 56.25rem;
+            margin: 0 auto;
+          }
+
+          .demo__tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #e2e8f0;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+          }
+
+          .demo__tag:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.1);
+          }
+
+          .demo__tag-icon {
+            width: 1.125rem;
+            height: 1.125rem;
+            flex-shrink: 0;
+          }
+
+          .demo__footer {
+            position: absolute;
+            bottom: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.875rem;
+            color: #475569;
+          }
+
+          .demo__footer a {
+            color: #64748b;
+            text-decoration: none;
+            transition: color 0.2s;
+          }
+
+          .demo__footer a:hover {
+            color: #94a3b8;
+          }
+
+          @media (min-width: 768px) {
+            .demo {
+              padding: 3.75rem 1.5rem;
+            }
+
+            .demo__badge {
+              margin-bottom: 1.5rem;
+            }
+
+            .demo__title {
+              margin-bottom: 1.5rem;
+            }
+
+            .demo__text {
+              font-size: 1.25rem;
+              margin-bottom: 3rem;
+            }
+
+            .demo__actions {
+              margin-bottom: 3rem;
+            }
+
+            .demo__btn {
+              padding: 1rem 2rem;
+            }
+
+            .demo__install {
+              margin: 0 auto 3rem;
+              padding: 1rem 1.5rem;
+            }
+
+            .demo__stack {
+              gap: 0.75rem;
+            }
+
+            .demo__tag {
+              padding: 0.625rem 1rem;
+            }
+
+            .demo__footer {
+              bottom: 1.5rem;
+            }
+          }
+        </style>
+
+        <section class="demo">
+          <div class="demo__content">
+            <span class="demo__badge">
+              <span class="demo__badge-dot"></span>
+              Production Ready
+            </span>
+
+            <h1 class="demo__title">
+              Gulp Template<br />
+              <span class="demo__gradient">Build Faster, Ship Sooner</span>
+            </h1>
+
+            <p class="demo__text">
+              A pre-configured foundation with SCSS, SVG sprites, image optimization, and automated workflows — so you
+              can focus on building, not configuring.
+            </p>
+
+            <div class="demo__actions">
+              <a
+                href="https://github.com/dmitrystotyka/gulp-template"
+                class="demo__btn demo__btn--primary"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path
+                    d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"
+                  />
+                </svg>
+                GitHub
+              </a>
+
+              <a
+                href="https://github.com/dmitrystotyka/gulp-template#readme"
+                class="demo__btn demo__btn--secondary"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z" />
+                  <path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z" />
+                </svg>
+                Documentation @@include('components/_icon.html', {"name": "arrow-right"})
+              </a>
+
+              <!-- Button component opening a modal from components/modals/_demo.html -->
+              @@include('components/_button.html', {"text": "Open modal", "class": "demo__btn demo__btn--secondary", "popup": "demo-modal"})
+            </div>
+
+            <button class="demo__install" onclick="demoCopyCommand(this)" type="button">
+              <span class="demo__install-dollar">$</span>
+              <span class="demo__install-text">npx degit dmitrystotyka/gulp-template my-app</span>
+              <svg
+                class="demo__install-icon"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+              </svg>
+            </button>
+
+            <div class="demo__stack">
+              <span class="demo__tag">
+                <svg class="demo__tag-icon" viewBox="0 0 24 24" fill="#E34F26">
+                  <path
+                    d="M1.5 0h21l-1.91 21.563L11.977 24l-8.564-2.438L1.5 0zm7.031 9.75l-.232-2.718 10.059.003.23-2.622L5.412 4.41l.698 8.01h9.126l-.326 3.426-2.91.804-2.955-.81-.188-2.11H6.248l.33 4.171L12 19.351l5.379-1.443.744-8.157H8.531z"
+                  />
+                </svg>
+                HTML
+              </span>
+
+              <span class="demo__tag">
+                <svg class="demo__tag-icon" viewBox="0 0 24 24" fill="#1572B6">
+                  <path
+                    d="M1.5 0h21l-1.91 21.563L11.977 24l-8.565-2.438L1.5 0zm17.09 4.413L5.41 4.41l.213 2.622 10.125.002-.255 2.716h-6.64l.24 2.573h6.182l-.366 3.523-2.91.804-2.956-.81-.188-2.11h-2.61l.29 3.855L12 19.288l5.373-1.53L18.59 4.414z"
+                  />
+                </svg>
+                CSS
+              </span>
+
+              <span class="demo__tag">
+                <svg class="demo__tag-icon" viewBox="0 0 24 24" fill="#CD6799">
+                  <path
+                    d="M12 0c6.627 0 12 5.373 12 12s-5.373 12-12 12S0 18.627 0 12 5.373 0 12 0zM9.615 15.998c.175.645.156 1.248-.024 1.792l-.065.18c-.024.061-.052.12-.078.176-.14.29-.326.56-.555.81-.698.759-1.672 1.047-2.09.805-.45-.262-.226-1.335.584-2.19.871-.918 2.12-1.509 2.12-1.509v-.003l.108-.061zm9.911-10.861c-.542-2.133-4.077-2.834-7.422-1.645-1.989.707-4.144 1.818-5.693 3.267C4.568 8.48 4.275 9.98 4.396 10.607c.427 2.211 3.457 3.657 4.703 4.73v.006c-.367.18-3.056 1.529-3.686 2.925-.675 1.47.105 2.521.615 2.655 1.575.436 3.195-.36 4.065-1.649.84-1.261.766-2.881.404-3.676.496-.13 1.079-.195 1.815-.104 2.164.24 2.594 1.529 2.49 2.07-.075.36-.239.525-.345.645-.105.12-.135.165-.105.255.045.135.21.12.465.09.36-.061.555-.255.72-.48.21-.345.375-.915.165-1.5-.54-1.545-2.264-2.46-5.114-2.175-.12-.12-.255-.255-.405-.405-.42-.42-1.005-1.021-1.29-1.5l-.03-.06c1.47-2.115 2.58-4.054 2.25-5.459a1.543 1.543 0 00-.435-.73.905.905 0 00-.705-.24c-1.29.105-1.575 1.98-1.095 3.75.15.539.435 1.109.765 1.695-.18.63-.36 1.275-.57 1.959-.45 1.335-.825 2.175-1.11 2.79-1.05.48-1.89.93-2.265 1.29-.6.569-.915 1.14-.78 1.62.12.465.495.675.945.69 1.77.06 3.6-1.5 4.56-3.75.585-.195 1.2-.39 1.845-.615 1.22-.41 2.175-.735 3.09-.96.015 0 .03.015.045.015.9.51 1.89.825 2.64.885 1.5.12 2.295-.39 2.52-.855.255-.555.12-1.17-.255-1.56-.51-.525-1.62-.78-3.3-.645a8.6 8.6 0 00-2.25.42c-.195-.12-.39-.255-.555-.39-.765-.645-1.335-1.38-1.815-2.295 1.02-3.63 1.47-4.785.96-5.88z"
+                  />
+                </svg>
+                SCSS
+              </span>
+
+              <span class="demo__tag">
+                <svg class="demo__tag-icon" viewBox="0 0 24 24" fill="#F7DF1E">
+                  <path
+                    d="M0 0h24v24H0V0zm22.034 18.276c-.175-1.095-.888-2.015-3.003-2.873-.736-.345-1.554-.585-1.797-1.14-.091-.33-.105-.51-.046-.705.15-.646.915-.84 1.515-.66.39.12.75.42.976.9 1.034-.676 1.034-.676 1.755-1.125-.27-.42-.405-.6-.586-.78-.63-.705-1.469-1.065-2.834-1.034l-.705.089c-.676.165-1.32.525-1.71 1.005-1.14 1.291-.811 3.541.569 4.471 1.365 1.02 3.361 1.244 3.616 2.205.24 1.17-.87 1.545-1.966 1.41-.811-.18-1.26-.586-1.755-1.336l-1.83 1.051c.21.48.45.689.81 1.109 1.74 1.756 6.09 1.666 6.871-1.004.029-.09.24-.705.074-1.65l.046.067zm-8.983-7.245h-2.248c0 1.938-.009 3.864-.009 5.805 0 1.232.063 2.363-.138 2.711-.33.689-1.18.601-1.566.48-.396-.196-.597-.466-.83-.855-.063-.105-.11-.196-.127-.196l-1.825 1.125c.305.63.75 1.172 1.324 1.517.855.51 2.004.675 3.207.405.783-.226 1.458-.691 1.811-1.411.51-.93.402-2.07.397-3.346.012-2.054 0-4.109 0-6.179l.004-.056z"
+                  />
+                </svg>
+                JavaScript
+              </span>
+
+              <span class="demo__tag">
+                <svg class="demo__tag-icon" viewBox="0 0 24 24" fill="#339933">
+                  <path
+                    d="M11.998 24c-.321 0-.641-.084-.922-.247l-2.936-1.737c-.438-.245-.224-.332-.08-.383.585-.203.703-.25 1.328-.604.065-.037.151-.023.218.017l2.256 1.339a.29.29 0 00.272 0l8.795-5.076a.277.277 0 00.134-.238V6.921a.283.283 0 00-.137-.242l-8.791-5.072a.278.278 0 00-.271 0L3.075 6.68a.284.284 0 00-.139.241v10.15a.27.27 0 00.139.235l2.409 1.392c1.307.654 2.108-.116 2.108-.89V7.787c0-.142.114-.253.256-.253h1.115c.139 0 .255.112.255.253v10.021c0 1.745-.95 2.745-2.604 2.745-.508 0-.909 0-2.026-.551l-2.306-1.326A1.85 1.85 0 011.369 17.07V6.921c0-.672.358-1.3.943-1.635L11.107.21a1.927 1.927 0 011.784 0l8.794 5.076c.585.336.943.963.943 1.635v10.15c0 .671-.358 1.298-.943 1.634l-8.794 5.076a1.876 1.876 0 01-.893.22z"
+                  />
+                </svg>
+                Node.js
+              </span>
+
+              <span class="demo__tag">
+                <svg class="demo__tag-icon" viewBox="0 0 24 24" fill="#CF4647">
+                  <path
+                    d="M6.767 21.456C5.588 22.923 3.893 24 2.283 24c-.273 0-.477-.043-.588-.065 1.665-1.66 2.11-4.702 2.393-6.863.088-.68.168-1.294.266-1.795.253-1.267.606-2.2 1.078-2.851.472-.65 1.058-.993 1.79-1.047.639-.046 1.19.17 1.591.624.4.454.59 1.073.548 1.79-.073 1.208-.605 2.543-1.58 3.967-.495.723-1.012 1.391-1.014 3.696zm12.466 0c-1.179 1.467-2.874 2.544-4.484 2.544-.273 0-.477-.043-.588-.065 1.665-1.66 2.11-4.702 2.393-6.863.088-.68.168-1.294.266-1.795.253-1.267.606-2.2 1.078-2.851.472-.65 1.058-.993 1.79-1.047.639-.046 1.19.17 1.591.624.4.454.59 1.073.548 1.79-.073 1.208-.605 2.543-1.58 3.967-.495.723-1.012 1.391-1.014 3.696zM10.015 0c-.273 0-.477.043-.588.065 1.665 1.66 2.11 4.702 2.393 6.863.088.68.168 1.294.266 1.795.253 1.267.606 2.2 1.078 2.851.472.65 1.058.993 1.79 1.047.639.046 1.19-.17 1.591-.624.4-.454.59-1.073.548-1.79-.073-1.208-.605-2.543-1.58-3.967C15.018 5.517 14.5 4.85 14.5 2.544 14.5 1.077 12.805 0 11.195 0h-1.18z"
+                  />
+                </svg>
+                Gulp
+              </span>
+
+              <span class="demo__tag">
+                <svg class="demo__tag-icon" viewBox="0 0 24 24" fill="#F69220">
+                  <path
+                    d="M0 0v7.5h7.5V0H0zm8.25 0v7.5h7.5V0h-7.5zm8.25 0v7.5H24V0h-7.5zM0 8.25v7.5h7.5v-7.5H0zm8.25 0v7.5h7.5v-7.5h-7.5zM0 16.5V24h7.5v-7.5H0zm8.25 0V24h7.5v-7.5h-7.5zm8.25 0V24H24v-7.5h-7.5z"
+                  />
+                </svg>
+                pnpm
+              </span>
+
+              <span class="demo__tag">
+                <svg class="demo__tag-icon" viewBox="0 0 24 24" fill="#4B32C3">
+                  <path
+                    d="M7.257 9.132L11.816 6.5a.369.369 0 01.368 0l4.559 2.632a.369.369 0 01.184.32v5.263a.37.37 0 01-.184.319l-4.559 2.632a.369.369 0 01-.368 0l-4.559-2.632a.369.369 0 01-.184-.32V9.452a.37.37 0 01.184-.32zM12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0z"
+                  />
+                </svg>
+                ESLint
+              </span>
+
+              <span class="demo__tag">
+                <svg class="demo__tag-icon" viewBox="0 0 24 24" fill="#F7B93E">
+                  <path
+                    d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm-.297 18.655c-.385.154-.63.196-.886.221-.634.063-1.108-.23-1.327-.626-.356-.642-.207-1.574.12-2.462l1.239-3.296c.087-.23.154-.475.154-.658 0-.253-.115-.56-.573-.56-.353 0-.785.197-1.153.48-.155.12-.28.262-.404.404l-.29-.368c.508-.533 1.26-1.012 2.21-1.012.78 0 1.437.41 1.437 1.253 0 .197-.023.44-.088.655l-1.23 3.32c-.073.197-.138.497-.138.678 0 .29.156.537.555.537.252 0 .63-.115 1.04-.37l.255.44c-.425.427-1.145.852-1.921 1.167v-.013zm1.69-9.26c-.656 0-1.19-.533-1.19-1.19s.534-1.19 1.19-1.19c.658 0 1.192.533 1.192 1.19s-.534 1.19-1.191 1.19z"
+                  />
+                </svg>
+                Prettier
+              </span>
+            </div>
+          </div>
+
+          <div class="demo__footer">
+            Made by <a href="https://dmitrystotyka.com" target="_blank" rel="noopener noreferrer">Dmitry Stotyka</a>
+          </div>
+        </section>
+
+        <script>
+          (function () {
+            function demoCopyCommand(btn) {
+              const text = btn.querySelector('.demo__install-text').textContent;
+
+              function showCheck() {
+                const icon = btn.querySelector('.demo__install-icon');
+                icon.outerHTML =
+                  '<svg class="demo__install-icon demo__install-icon--check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+                setTimeout(function () {
+                  const check = btn.querySelector('.demo__install-icon');
+                  check.outerHTML =
+                    '<svg class="demo__install-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>';
+                }, 2000);
+              }
+
+              try {
+                navigator.clipboard
+                  .writeText(text)
+                  .then(showCheck)
+                  .catch(function () {
+                    fallbackCopy(text, btn, showCheck);
+                  });
+              } catch (e) {
+                fallbackCopy(text, btn, showCheck);
+              }
+            }
+
+            function fallbackCopy(text, btn, showCheck) {
+              var textArea = document.createElement('textarea');
+              textArea.value = text;
+              textArea.style.position = 'fixed';
+              textArea.style.opacity = '0';
+              document.body.appendChild(textArea);
+              textArea.select();
+
+              try {
+                document.execCommand('copy');
+                showCheck();
+              } catch (e) {
+                var range = document.createRange();
+                range.selectNodeContents(btn.querySelector('.demo__install-text'));
+                window.getSelection().removeAllRanges();
+                window.getSelection().addRange(range);
+              } finally {
+                document.body.removeChild(textArea);
+              }
+            }
+
+            window.demoCopyCommand = demoCopyCommand;
+          })();
+        </script>
+      </main>
+    </div>
+
+    <!-- Popups -->
+    @@include('layouts/_modals.html')
+    @@include('components/modals/_demo.html')
+
+    <!-- Scripts: enable components in layouts/_scripts.html -->
+    @@include('layouts/_scripts.html')
+  </body>
+</html>

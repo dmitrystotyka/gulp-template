@@ -14,10 +14,10 @@
 // Layout
 // ─────────────────────────────────────────────────────────────
 body {
-  font-size: rem(16);
-  font-family: var(--font-family);
+  font-size: var(--text-base);
+  font-family: var(--font-sans);
   color: var(--color-text);
-  line-height: 1.5;
+  line-height: var(--text-base--line-height);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

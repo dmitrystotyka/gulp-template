@@ -9,10 +9,62 @@
         "message": "Expected function name to be kebab-case (leading _ marks module-private)"
       }
     ],
-    "no-descending-specificity": [true, { "severity": "warning" }],
-    "declaration-no-important": [true, { "severity": "warning" }],
-    "selector-max-id": [1, { "severity": "warning" }],
-    "max-nesting-depth": [4, { "severity": "warning" }]
+    "no-descending-specificity": [
+      true,
+      {
+        "severity": "warning"
+      }
+    ],
+    "declaration-no-important": [
+      true,
+      {
+        "severity": "warning"
+      }
+    ],
+    "selector-max-id": [
+      1,
+      {
+        "severity": "warning"
+      }
+    ],
+    "max-nesting-depth": [
+      4,
+      {
+        "severity": "warning"
+      }
+    ],
+    "unit-disallowed-list": [
+      ["px", "rem", "em"],
+      {
+        "ignoreFunctions": ["var"],
+        "message": "Write sizes through rem()/em(): rem(18), em(20)"
+      }
+    ],
+    "color-no-hex": [
+      true,
+      {
+        "message": "Use a color token: var(--color-sky-500) (palette lives in vars.scss)"
+      }
+    ],
+    "color-named": [
+      "never",
+      {
+        "ignore": ["inside-function"],
+        "message": "Use a color token: var(--color-white)"
+      }
+    ],
+    "custom-property-pattern": [
+      "^[a-z][a-z0-9]*(-{1,2}[a-z0-9]+)*$",
+      {
+        "message": "Tailwind-style token: --color-red-300, --text-lg--line-height"
+      }
+    ],
+    "function-disallowed-list": [
+      ["rgb", "rgba", "hsl", "hsla"],
+      {
+        "message": "Use a token; for opacity alpha(gray-950, 60)"
+      }
+    ]
   },
   "overrides": [
     {
@@ -36,6 +88,28 @@
             ]
           }
         ]
+      }
+    },
+    {
+      "files": ["src/styles/vars.scss"],
+      "rules": {
+        "color-no-hex": null,
+        "color-named": null,
+        "custom-property-empty-line-before": null,
+        "hue-degree-notation": null,
+        "function-disallowed-list": null
+      }
+    },
+    {
+      "files": ["src/styles/_mixins.scss"],
+      "rules": {
+        "unit-disallowed-list": null
+      }
+    },
+    {
+      "files": ["src/styles/critical.scss"],
+      "rules": {
+        "color-no-hex": null
       }
     }
   ],

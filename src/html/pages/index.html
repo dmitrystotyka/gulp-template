@@ -1,19 +1,34 @@
 <!doctype html>
 <html lang="@@lang">
   <head>
-    <!-- prettier-ignore -->
     @@include('layouts/_head.html', {
-      "title": "Gulp Template",
-      "description": "A pre-configured foundation with SCSS, SVG sprites, image optimization, and automated workflows — so you can focus on building, not configuring.",
+      "title": "Home",
+      "description": "",
       "image": "./assets/img/previews/global.webp"
     })
   </head>
 
   <body>
     <div class="wrapper">
-      <main class="page">@@include('components/demo.html')</main>
+      @@include('layouts/_header.html')
+
+      <main class="page">
+        <section class="hero">
+          <div class="container">
+            <h1>Home</h1>
+            <!-- Template showcase — remove this link together with pages/demo.html -->
+            <p><a href="./demo.html">See the template demo →</a></p>
+          </div>
+        </section>
+      </main>
+
+      @@include('layouts/_footer.html')
     </div>
 
-    <script src="./scripts/app.js" type="module"></script>
+    <!-- Popups -->
+    @@include('layouts/_modals.html')
+
+    <!-- Scripts: enable components in layouts/_scripts.html -->
+    @@include('layouts/_scripts.html')
   </body>
 </html>

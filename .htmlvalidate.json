@@ -1,0 +1,6 @@
+{
+  "extends": ["html-validate:recommended", "html-validate:prettier"],
+  "rules": {
+    "no-inline-style": ["error", { "allowedProperties": ["display", "position", "width", "height", "overflow"] }]
+  }
+}

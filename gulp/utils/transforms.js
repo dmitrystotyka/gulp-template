@@ -58,6 +58,7 @@ export const htmlMinify = () =>
     const minified = await htmlMinifyRaw(file.contents.toString(), {
       collapseWhitespace: true,
       conservativeCollapse: true,
+      collapseBooleanAttributes: true, // defer="defer" → defer (same DOM)
       removeComments: true,
       removeScriptTypeAttributes: true,
       removeStyleLinkTypeAttributes: true,
@@ -74,6 +75,39 @@ export const htmlMinify = () =>
 export const replaceContents = (search, replacement) =>
   contentTransform('Content replace', (file) => {
     file.contents = Buffer.from(file.contents.toString().split(search).join(replacement));
+  });
+
+/** Append text to file contents (no-op for an empty string). */
+export const appendContents = (text) =>
+  contentTransform('Content append', (file) => {
+    if (text) file.contents = Buffer.concat([file.contents, Buffer.from(text)]);
+  });
+
+/**
+ * Drop source-only comments `<!--- … --->` (component docs) so they don't
+ * repeat in every page that uses the component. Normal `<!-- -->` stay.
+ */
+export const stripSourceComments = () =>
+  contentTransform('Source comments', (file) => {
+    const sourceOnly = /[ \t]*<!---[\s\S]*?--->[ \t]*\r?\n?/g;
+    file.contents = Buffer.from(file.contents.toString().replace(sourceOnly, ''));
+  });
+
+/**
+ * Inline the SVG sprite right after <body> on pages that use icons
+ * (`<use href="#name">`). An external `sprite.svg#name` is blocked on file://,
+ * an inline one works everywhere. `sprite` is the compiled sprite markup.
+ */
+export const inlineSprite = (sprite) =>
+  contentTransform('Sprite inline', (file) => {
+    const html = file.contents.toString();
+    if (!sprite || !/<use\s+href="#/.test(html)) return;
+
+    const markup = sprite
+      .replace(/<\?xml[^>]*>\s*/, '')
+      .replace(/<svg\b/, '<svg aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden"');
+
+    file.contents = Buffer.from(html.replace(/<body\b[^>]*>/, (body) => `${body}\n${markup}`));
   });
 
 /**
@@ -109,7 +143,7 @@ export const jsMinify = () =>
     const result = await terserMinify(
       { [file.relative]: file.contents.toString() },
       {
-        module: true,
+        module: false, // classic scripts (file://-compatible), see src/scripts/CLAUDE.md
         format: { comments: false },
         compress: { drop_debugger: true },
         ...(file.sourceMap ? { sourceMap: { content: file.sourceMap, filename: file.relative } } : {}),

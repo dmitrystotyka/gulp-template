@@ -1,4 +1,44 @@
-/* Critical (above-the-fold) styles.
- * Enable with optimization.criticalCSS: true (project.config.js) —
- * the compiled result is inlined into the <head> of every page.
- * Keep it tiny: first-screen layout only. */
+@use 'mixins' as *;
+
+/* ─────────────────────────────────────────────────────────────
+ * Critical styles — the very first CSS the browser applies.
+ * Compiled and inlined into <head> of every page, before any
+ * stylesheet loads (criticalCSS: true in project.config.js).
+ *
+ * Put here only what must paint instantly: a preloader, the first
+ * screen's skeleton, a background that avoids a white flash.
+ * Everything else belongs in main.scss / ui.scss.
+ *
+ * vars.css is NOT loaded yet when this paints — give every token a
+ * fallback: var(--color-white, #fff). Sizes still go through rem()/em().
+ * ───────────────────────────────────────────────────────────── */
+
+/* Example — preloader shown until the page is ready
+(markup: <div class="preloader"></div> right after <body>;
+ hide it from app.js: document.querySelector('.preloader')?.remove())
+
+.preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  background-color: var(--color-white, #fff);
+
+  &::after {
+    content: '';
+    width: rem(40);
+    height: rem(40);
+    border: rem(3) solid var(--color-gray-200, #e5e7eb);
+    border-top-color: var(--color-sky-500, #0ea5e9);
+    border-radius: 50%;
+    animation: preloader-spin 0.8s linear infinite;
+  }
+}
+
+@keyframes preloader-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+*/

@@ -42,19 +42,18 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Lint (ESLint + Stylelint)
-        run: pnpm lint && pnpm lint:css
-
-      - name: Format check (Prettier)
-        run: pnpm format:check
+      - name: Lint + format check (ESLint · Stylelint · Prettier)
+        run: pnpm check
 
       # Advisory only (|| true): a brand-new upstream advisory must not block
       # unrelated PRs, but vulnerabilities stay visible in every run's log.
       - name: Audit dependencies (advisory)
         run: pnpm audit --audit-level=high || true
 
-      - name: Production build + smoke test
-        run: pnpm build:prod && node scripts/check-dist.mjs --mode=prod
+      - name: Production build + smoke test + HTML validation
+        run: pnpm build && node scripts/check-dist.mjs --mode=prod && pnpm validate
 
-      - name: Handoff build + smoke test
-        run: pnpm build:handoff && node scripts/check-dist.mjs --mode=handoff
+      - name: Handoff build + smoke test + HTML validation
+        run: pnpm build && node scripts/check-dist.mjs --mode=handoff && pnpm validate
+        env:
+          BUILD_TARGET: handoff

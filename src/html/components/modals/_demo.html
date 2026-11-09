@@ -1,0 +1,13 @@
+<!--- Demo modal — delete together with pages/demo.html. Copy this file to make a new modal. --->
+@@include('components/modals/_frame-start.html', {"id": "demo-modal", "title": "Modal component"})
+
+      <p>
+        Everything about this modal lives in one file:
+        <code>components/modals/_demo.html</code> — id, title and any markup.
+      </p>
+
+      <p>
+        @@include('components/_button.html', {"text": "Got it", "variant": "outline", "close": "true"})
+      </p>
+
+@@include('components/modals/_frame-end.html')

@@ -1,0 +1,12 @@
+<!---
+  Button / link button. Only "text" is required.
+    "href"    → renders <a>, otherwise <button>
+    "type"    → button type (default "button")
+    "variant" → btn--<variant>: "outline"
+    "icon"    → sprite icon after the text: "arrow-right"
+    "popup"   → opens the modal with this id: "callback"
+    "close"   → closes the modal it sits in: "true"
+    "class"   → extra classes
+--->
+@@if (context.href) {<a class="btn@@if (context.variant) { btn--@@variant}@@if (context.class) { @@class}" href="@@href"@@if (context.popup) { data-popup="@@popup"}@@if (context.close) { data-popup-close}>@@text@@if (context.icon) { @@include('components/_icon.html', {"name": "@@icon"})}</a>}
+@@if (!context.href) {<button class="btn@@if (context.variant) { btn--@@variant}@@if (context.class) { @@class}" type="@@if (context.type) {@@type}@@if (!context.type) {button}"@@if (context.popup) { data-popup="@@popup"}@@if (context.close) { data-popup-close}>@@text@@if (context.icon) { @@include('components/_icon.html', {"name": "@@icon"})}</button>}

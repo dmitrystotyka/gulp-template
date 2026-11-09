@@ -1,7 +1,6 @@
 <!doctype html>
 <html lang="@@lang">
   <head>
-    <!-- prettier-ignore -->
     @@include('layouts/_head.html', {
       "title": "Template Page",
       "description": "Template Page description",
@@ -18,8 +17,10 @@
       @@include('layouts/_footer.html')
     </div>
 
+    <!-- Popups -->
     @@include('layouts/_modals.html')
 
-    <script src="./scripts/app.js" type="module"></script>
+    <!-- Scripts: enable components in layouts/_scripts.html -->
+    @@include('layouts/_scripts.html')
   </body>
 </html>

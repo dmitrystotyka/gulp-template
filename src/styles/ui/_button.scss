@@ -11,19 +11,19 @@
   justify-content: center;
   gap: em(8);
   padding: em(12) em(24);
-  font-size: rem(16);
-  font-weight: 500;
-  line-height: 1.5;
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--text-base--line-height);
   text-align: center;
   text-decoration: none;
   white-space: nowrap;
   cursor: pointer;
   user-select: none;
   border: rem(2) solid transparent;
-  border-radius: var(--radius);
-  background-color: var(--black);
-  color: var(--white);
-  transition: opacity var(--transition-fast) ease;
+  border-radius: var(--radius-lg);
+  background-color: var(--color-gray-900);
+  color: var(--color-white);
+  transition: opacity var(--duration-150) ease;
 
   @include hover {
     opacity: 0.85;
@@ -43,4 +43,11 @@
   width: em(20);
   height: em(20);
   flex-shrink: 0;
+}
+
+/* Variant: outline — components/_button.html {"variant": "outline"} */
+.btn--outline {
+  border-color: currentcolor;
+  background-color: transparent;
+  color: var(--color-gray-900);
 }

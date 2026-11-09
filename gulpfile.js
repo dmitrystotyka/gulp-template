@@ -45,7 +45,8 @@ const watch = () => {
   gulp.watch(globs.htmlPages, withTailwind(html)).on('unlink', createUnlinkHandler(paths.srcHtmlPages, paths.build));
   gulp.watch(globs.htmlShared, withTailwind(htmlAll));
   gulp
-    .watch(globs.stylesWatch, styles)
+    // SCSS class names are excluded from Tailwind (tasks/tailwind.js) — rebuild it too
+    .watch(globs.stylesWatch, withTailwind(styles))
     .on('unlink', createUnlinkHandler(paths.srcStyles, paths.buildStyles, { '.scss': '.css' }));
   gulp
     .watch(globs.scripts, withTailwind(scripts))
@@ -53,7 +54,8 @@ const watch = () => {
   gulp
     .watch(globs.images, gulp.series(images, imagesWebp, imagesAvif))
     .on('unlink', createUnlinkHandler(paths.srcImages, paths.buildImages, {}, ['.webp', '.avif']));
-  gulp.watch(globs.sprites, sprite);
+  // Pages inline the sprite, so icon changes rebuild every page
+  gulp.watch(globs.sprites, gulp.series(sprite, htmlAll));
   gulp.watch(globs.assets, assets).on('unlink', createUnlinkHandler(paths.srcAssets, paths.buildAssets));
 
   if (config.tailwind.active) {
@@ -71,7 +73,8 @@ const watch = () => {
 // ─────────────────────────────────────────────────────────────
 
 const imagesTasks = gulp.series(images, imagesWebp, imagesAvif);
-const mainTasks = gulp.parallel(html, styles, tailwind, scripts, imagesTasks, sprite, assets, vendors);
+// html inlines the compiled sprite — it must run after sprite
+const mainTasks = gulp.parallel(gulp.series(sprite, html), styles, tailwind, scripts, imagesTasks, assets, vendors);
 const seoTasks = gulp.series(sitemap, robots);
 
 // ─────────────────────────────────────────────────────────────
@@ -81,11 +84,9 @@ const seoTasks = gulp.series(sitemap, robots);
 const fullBuild = gulp.series(logBuildStart, clean, mainTasks, gulp.parallel(seoTasks, tailwindKit), logBuildEnd);
 
 gulp.task('dev', gulp.series(logBuildStart, clean, mainTasks, gulp.parallel(watch, server)));
-gulp.task('build:dev', gulp.series(logBuildStart, clean, mainTasks, logBuildEnd));
-// build:prod and build:handoff share the pipeline — the difference lives in
-// project.config.js (minify/sortMediaQueries off for handoff via BUILD_TARGET).
-gulp.task('build:prod', fullBuild);
-gulp.task('build:handoff', fullBuild);
+// One build for prod and handoff — the difference lives in .env.handoff
+// (loaded over .env.production when BUILD_TARGET=handoff, see `pnpm zip`).
+gulp.task('build', fullBuild);
 gulp.task('preview', server);
 
 // Graceful shutdown — close BrowserSync and free port

@@ -1,0 +1,14 @@
+<!---
+  Modal frame, opening half — always paired with components/modals/_frame-end.html.
+  Used only inside a modal file in components/modals/ (see components/modals/_demo.html).
+    "id"    → required; open with data-popup="<id>" or the "popup" param of _button.html
+    "title" → optional heading (modals.js links it as the dialog name)
+    "class" → optional extra classes on .popup
+--->
+<div class="popup@@if (context.class) { @@class}" id="@@id">
+  <div class="popup__body">
+    <button class="popup__close" type="button" aria-label="Close" data-popup-close>
+      @@include('components/_icon.html', {"name": "close"})
+    </button>
+    @@if (context.title) {<h2 class="popup__title" id="@@id-title">@@title</h2>}
+    <div class="popup__content">

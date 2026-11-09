@@ -1,18 +1,6 @@
-<!-- Modals — modal wrapper + modal script -->
+<!---
+  Modals shared by every page: one include per file from components/modals/, below the wrapper.
+  A modal used on one page only → include its file in that page instead.
+  Script: components/modals.js in layouts/_scripts.html.
+--->
 <div id="modal-wrapper"></div>
-
-<!--
-  Example modal — uncomment and customize:
-
-  Usage: <button data-popup="example-modal">Open Modal</button>
-
-  <div class="popup" id="example-modal">
-    <div class="popup__body">
-      <h2>Modal Title</h2>
-      <p>Modal content goes here.</p>
-      <button type="button" data-popup-close>Close</button>
-    </div>
-  </div>
--->
-
-<script src="./scripts/components/modals.js" type="module"></script>

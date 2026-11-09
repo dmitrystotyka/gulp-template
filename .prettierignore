@@ -4,3 +4,7 @@ pnpm-lock.yaml
 *.min.js
 *.min.css
 vercel.json
+
+# HTML sources: Prettier joins neighbouring @@include lines into one paragraph
+# and breaks @@if inside tags. Written by hand; dist/ is formatted by the build.
+src/html/

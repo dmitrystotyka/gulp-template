@@ -139,6 +139,20 @@ $breakpoints: (
   @return math.div($value, $base) * 1em;
 }
 
+/// Color token with opacity — the Tailwind `bg-gray-950/60` syntax for SCSS.
+/// Pass the token name without `--color-` and the opacity 0–100;
+/// compiles to color-mix(), exactly what Tailwind v4 emits.
+/// @example scss
+///   background-color: alpha(gray-950, 60);   // color-mix(in oklab, var(--color-gray-950) 60%, transparent)
+///   border-color: alpha(white, 20);
+@function alpha($color, $opacity) {
+  @if meta.type-of($opacity) != 'number' or not math.is-unitless($opacity) or $opacity < 0 or $opacity > 100 {
+    @error 'alpha(#{$color}, #{$opacity}): opacity is a number 0–100, e.g. alpha(gray-950, 60)';
+  }
+
+  @return color-mix(in oklab, var(--color-#{$color}) #{$opacity * 1%}, transparent);
+}
+
 /// Fluid value between two viewport widths (px in, clamp() out)
 /// @example scss
 ///   font-size: fluid(24, 48);              // 24px at 375px → 48px at 1230px

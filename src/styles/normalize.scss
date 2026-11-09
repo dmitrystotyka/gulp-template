@@ -18,7 +18,7 @@ html {
   scroll-behavior: smooth;
   text-size-adjust: 100%;
   overscroll-behavior: none;
-  background-color: var(--color-bg, #fff);
+  background-color: var(--color-bg);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -42,7 +42,7 @@ html {
 
 body {
   min-height: 100dvh;
-  background-color: var(--color-bg, #fff);
+  background-color: var(--color-bg);
 }
 
 /* Typography */

@@ -20,7 +20,7 @@
   pointer-events: none;
   opacity: 0;
   transition: opacity var(--popup-speed, 0.5s) ease;
-  background-color: rgb(0 0 0 / 50%);
+  background-color: var(--color-overlay);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -35,11 +35,45 @@
 }
 
 .popup__body {
+  position: relative;
+  padding: rem(40 24 24);
   margin: auto;
   max-width: min(90vw, #{rem(600)});
   max-height: 85dvh;
   overflow-y: auto;
   overscroll-behavior: contain;
-  border-radius: var(--radius);
-  background-color: var(--white);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-white);
+}
+
+.popup__close {
+  position: absolute;
+  top: rem(8);
+  right: rem(8);
+  display: grid;
+  place-items: center;
+  width: rem(32);
+  height: rem(32);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--color-gray-500);
+  font-size: rem(20);
+  cursor: pointer;
+
+  @include hover {
+    color: var(--color-gray-900);
+  }
+}
+
+.popup__title {
+  margin-bottom: rem(12);
+  font-size: var(--text-xl);
+  line-height: var(--text-xl--line-height);
+  font-weight: var(--font-weight-semibold);
+}
+
+.popup__content {
+  color: var(--color-gray-700);
 }
